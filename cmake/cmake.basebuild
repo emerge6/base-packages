@@ -5,4 +5,3 @@ SOURCE_URL=https://github.com/Kitware/CMake/releases/download/v3.30.5/cmake-3.30
 FETCH_METHOD=wget
 BUILD=./bootstrap --prefix=/usr && make -j$(nproc)
 INSTALL=make install
-CHECKSUM=4b4e1f77b8fd1aeadc8c2625996d3dddab25a9b8b05fd22d5f3fd582c80d1116
