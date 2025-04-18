@@ -1,0 +1,8 @@
+NAME=neofetch
+VERSION=7.1.0
+DEPENDENCIES=
+SOURCE_URL=https://github.com/dylanaraps/neofetch/archive/refs/tags/7.1.0.tar.gz
+FETCH_METHOD=curl
+BUILD=make install PREFIX=/usr
+INSTALL=cp neofetch /usr/bin/
+
