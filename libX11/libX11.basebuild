@@ -1,0 +1,8 @@
+NAME=libX11
+VERSION=1.8.10
+DEPENDENCIES=xtrans xorgproto
+SOURCE_URL=https://www.x.org/archive/individual/lib/libX11-1.8.10.tar.gz
+FETCH_METHOD=curl
+BUILD=./configure --prefix=/usr && make -j$(nproc)
+INSTALL=make install
+CHECKSUM=4b7a2f26f803f7c7e3b7d44a2b8c0f39d0d6a4e1c6b4040c1b2b1b2b1b2b1b2
