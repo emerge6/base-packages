@@ -1,0 +1,8 @@
+NAME=doas
+VERSION=6.8.2
+DEPENDENCIES=libpam
+SOURCE_URL=https://github.com/Duncaen/OpenDoas/archive/refs/tags/v6.8.2.tar.gz
+FETCH_METHOD=curl
+BUILD="make"
+INSTALL="make install PREFIX=/usr"
+

@@ -1,0 +1,7 @@
+NAME=procs
+VERSION=0.14.4
+DEPENDENCIES=rust
+SOURCE_URL=https://github.com/dalance/procs/archive/refs/tags/v0.14.4.tar.gz
+FETCH_METHOD=curl
+BUILD='cargo build --release'
+INSTALL='install -Dm755 target/release/procs /usr/bin/procs'

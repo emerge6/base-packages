@@ -1,0 +1,7 @@
+NAME=fd
+VERSION=8.7.0
+DEPENDENCIES=rust
+SOURCE_URL=https://github.com/sharkdp/fd/archive/refs/tags/v8.7.0.tar.gz
+FETCH_METHOD=curl
+BUILD='cargo build --release'
+INSTALL='install -Dm755 target/release/fd /usr/bin/fd'

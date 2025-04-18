@@ -1,0 +1,7 @@
+NAME=libxft
+VERSION=2.3.3
+DEPENDENCIES=libx11
+SOURCE_URL=https://www.x.org/releases/individual/lib/libXft-2.3.3.tar.xz
+FETCH_METHOD=curl
+BUILD='./configure --prefix=/usr && make'
+INSTALL='make install'

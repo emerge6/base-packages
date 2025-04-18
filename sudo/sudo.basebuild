@@ -1,0 +1,7 @@
+NAME=sudo
+VERSION=1.9.15
+DEPENDENCIES=glibc
+SOURCE_URL=https://www.sudo.ws/dist/sudo-1.9.15.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"

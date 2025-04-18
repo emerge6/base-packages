@@ -1,0 +1,7 @@
+NAME=libxext
+VERSION=1.3.4
+DEPENDENCIES=libx11
+SOURCE_URL=https://www.x.org/releases/individual/lib/libXext-1.3.4.tar.xz
+FETCH_METHOD=curl
+BUILD='./configure --prefix=/usr && make'
+INSTALL='make install'

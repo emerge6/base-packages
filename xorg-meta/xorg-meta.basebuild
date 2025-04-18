@@ -1,0 +1,8 @@
+NAME=xorg-meta
+VERSION=1.0
+DEPENDENCIES=xorg-server,xinit,xterm,xf86-video-vesa,xf86-input-libinput,mesa,libx11,libxft,libxext
+SOURCE_URL=meta
+FETCH_METHOD=none
+BUILD="echo 'Meta package, no build needed'"
+INSTALL="echo 'Meta package installed'"
+

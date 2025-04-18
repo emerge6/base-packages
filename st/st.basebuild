@@ -1,0 +1,8 @@
+NAME=st
+VERSION=0.9
+DEPENDENCIES=libX11,libXft,libXext
+SOURCE_URL=https://dl.suckless.org/st/st-0.9.tar.gz
+FETCH_METHOD=curl
+BUILD="tar -xf st-0.9.tar.gz && cd st-0.9 && make"
+INSTALL="cd st-0.9 && make install"
+

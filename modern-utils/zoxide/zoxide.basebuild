@@ -1,0 +1,7 @@
+NAME=zoxide
+VERSION=0.9.4
+DEPENDENCIES=rust
+SOURCE_URL=https://github.com/ajeetdsouza/zoxide/archive/refs/tags/v0.9.4.tar.gz
+FETCH_METHOD=curl
+BUILD='cargo build --release'
+INSTALL='install -Dm755 target/release/zoxide /usr/bin/zoxide'

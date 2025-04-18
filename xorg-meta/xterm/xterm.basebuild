@@ -1,0 +1,7 @@
+NAME=xterm
+VERSION=374
+DEPENDENCIES=libx11
+SOURCE_URL=https://github.com/xterm/xterm/releases/download/374/xterm-374.tgz
+FETCH_METHOD=curl
+BUILD='./configure --prefix=/usr && make'
+INSTALL='make install'

@@ -1,0 +1,8 @@
+NAME=zsh
+VERSION=5.9
+DEPENDENCIES=ncurses
+SOURCE_URL=https://www.zsh.org/pub/zsh-5.9.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"
+

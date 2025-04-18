@@ -1,0 +1,7 @@
+NAME=exa
+VERSION=0.10.1
+DEPENDENCIES=rust
+SOURCE_URL=https://github.com/ogham/exa/archive/refs/tags/v0.10.1.tar.gz
+FETCH_METHOD=curl
+BUILD='cargo build --release'
+INSTALL='install -Dm755 target/release/exa /usr/bin/exa'

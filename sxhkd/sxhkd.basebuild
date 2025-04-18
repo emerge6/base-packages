@@ -1,0 +1,8 @@
+NAME=sxhkd
+VERSION=0.6.2
+DEPENDENCIES=glibc,xcb-util,xcb-util-keysyms
+SOURCE_URL=https://github.com/baskerville/sxhkd/archive/refs/tags/0.6.2.tar.gz
+FETCH_METHOD=curl
+BUILD="make"
+INSTALL="make install PREFIX=/usr"
+

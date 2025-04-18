@@ -1,0 +1,8 @@
+NAME=nano
+VERSION=7.2
+DEPENDENCIES=ncurses
+SOURCE_URL=https://www.nano-editor.org/dist/v7/nano-7.2.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"
+

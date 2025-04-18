@@ -1,0 +1,7 @@
+NAME=xf86-input-libinput
+VERSION=1.2.1
+DEPENDENCIES=libx11,libinput
+SOURCE_URL=https://www.x.org/releases/individual/driver/xf86-input-libinput-1.2.1.tar.xz
+FETCH_METHOD=curl
+BUILD='./configure --prefix=/usr && make'
+INSTALL='make install'

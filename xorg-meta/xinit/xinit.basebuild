@@ -1,0 +1,7 @@
+NAME=xinit
+VERSION=1.4.1
+DEPENDENCIES=
+SOURCE_URL=https://www.x.org/releases/individual/app/xinit-1.4.1.tar.xz
+FETCH_METHOD=curl
+BUILD='./configure --prefix=/usr && make'
+INSTALL='make install'

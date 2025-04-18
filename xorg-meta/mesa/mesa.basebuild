@@ -1,0 +1,7 @@
+NAME=mesa
+VERSION=23.1.0
+DEPENDENCIES=libx11,libxext,libdrm
+SOURCE_URL=https://mesa.freedesktop.org/archive/mesa-23.1.0.tar.xz
+FETCH_METHOD=curl
+BUILD='./configure --prefix=/usr --enable-dri3 && make'
+INSTALL='make install'

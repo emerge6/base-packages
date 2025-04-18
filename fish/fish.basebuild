@@ -1,0 +1,8 @@
+NAME=fish
+VERSION=3.7.0
+DEPENDENCIES=ncurses,cmake
+SOURCE_URL=https://github.com/fish-shell/fish-shell/archive/refs/tags/3.7.0.tar.gz
+FETCH_METHOD=curl
+BUILD="cmake -B build -DCMAKE_INSTALL_PREFIX=/usr && cmake --build build"
+INSTALL="cmake --install build"
+

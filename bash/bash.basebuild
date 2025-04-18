@@ -1,0 +1,8 @@
+NAME=bash
+VERSION=5.2.21
+DEPENDENCIES=glibc
+SOURCE_URL=https://ftp.gnu.org/gnu/bash/bash-5.2.21.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"
+

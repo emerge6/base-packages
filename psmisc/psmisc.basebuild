@@ -1,0 +1,8 @@
+NAME=psmisc
+VERSION=23.6
+DEPENDENCIES=glibc
+SOURCE_URL=https://gitlab.com/psmisc/psmisc/-/archive/psmisc-23.6/psmisc-psmisc-23.6.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"
+

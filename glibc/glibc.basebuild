@@ -1,0 +1,8 @@
+NAME=glibc
+VERSION=2.38
+DEPENDENCIES=
+SOURCE_URL=https://ftp.gnu.org/gnu/libc/glibc-2.38.tar.xz
+FETCH_METHOD=curl
+BUILD="mkdir build && cd build && ../configure --prefix=/usr && make"
+INSTALL="make install"
+

@@ -1,0 +1,7 @@
+NAME=duf
+VERSION=0.8.1
+DEPENDENCIES=go
+SOURCE_URL=https://github.com/muesli/duf/archive/refs/tags/v0.8.1.tar.gz
+FETCH_METHOD=curl
+BUILD='go build .'
+INSTALL='install -Dm755 duf /usr/bin/duf'

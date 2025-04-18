@@ -1,0 +1,8 @@
+NAME=e2fsprogs
+VERSION=1.47.0
+DEPENDENCIES=glibc
+SOURCE_URL=https://mirrors.edge.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.0/e2fsprogs-1.47.0.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"
+

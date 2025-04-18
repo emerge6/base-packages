@@ -1,0 +1,8 @@
+NAME=dwm
+VERSION=6.4
+DEPENDENCIES=
+SOURCE_URL=https://dl.suckless.org/dwm/dwm-6.4.tar.gz
+FETCH_METHOD=curl
+BUILD="mkdir -p \$HOME/dwm && tar -xf dwm-6.4.tar.gz -C \$HOME/dwm --strip-components=1"
+INSTALL="echo 'dwm sources unpacked to \$HOME/dwm'"
+

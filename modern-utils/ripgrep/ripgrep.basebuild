@@ -1,0 +1,7 @@
+NAME=ripgrep
+VERSION=14.0.3
+DEPENDENCIES=rust
+SOURCE_URL=https://github.com/BurntSushi/ripgrep/archive/refs/tags/14.0.3.tar.gz
+FETCH_METHOD=curl
+BUILD='cargo build --release'
+INSTALL='install -Dm755 target/release/rg /usr/bin/rg'
