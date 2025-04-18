@@ -5,4 +5,4 @@ SOURCE_URL=https://www.x.org/archive/individual/lib/xtrans-1.5.0.tar.gz
 FETCH_METHOD=curl
 BUILD=./configure --prefix=/usr && make -j$(nproc)
 INSTALL=make install
-CHECKSUM=1b4e1f26f803f7c7e3b7d44a2b8c0f39d0d6a4e1c6b4040c1b2b1b2b1b2b1b2
+CHECKSUM=a806f8a92f879dcd0146f3f1153fdffe845f2fc0df9b1a26c19312b7b0a29c86
