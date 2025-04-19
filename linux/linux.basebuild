@@ -1,6 +1,6 @@
 NAME=linux
 VERSION=latest
-DEPENDENCIES=git build-essential libncurses-dev bison flex libssl-dev libelf-dev bc
+DEPENDENCIES=git build-essential ncurses bison flex libssl libelf bc
 SOURCE_URL=https://github.com/emerge6/linux.git
 FETCH_METHOD=git
 BUILD="make defconfig && make -j$(nproc)"
