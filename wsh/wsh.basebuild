@@ -1,0 +1,7 @@
+NAME=wsh
+VERSION=2.4
+DEPENDENCIES=
+SOURCE_URL=https://github.com/emerge6/wsh.git
+FETCH_METHOD=git
+BUILD=g++ -o wsh wsh.cpp -lreadline -std=c++17
+INSTALL=mv wsh /usr/bin/
