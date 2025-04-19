@@ -1,0 +1,7 @@
+NAME=popt
+VERSION=1.18
+DEPENDENCIES=
+SOURCE_URL=https://ftp.ossp.org/pkg/lib/popt/popt-1.18.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"

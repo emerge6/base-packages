@@ -1,0 +1,7 @@
+NAME=libnm
+VERSION=1.52.0
+DEPENDENCIES=
+SOURCE_URL=https://download.gnome.org/sources/NetworkManager/1.52/NetworkManager-1.52.0.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --enable-introspection=yes && make"
+INSTALL="make install"

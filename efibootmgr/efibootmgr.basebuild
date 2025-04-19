@@ -1,0 +1,7 @@
+NAME=efibootmgr
+VERSION=18
+DEPENDENCIES=efivar,popt
+SOURCE_URL=https://github.com/rhboot/efibootmgr/archive/refs/tags/18.tar.gz
+FETCH_METHOD=curl
+BUILD="make"
+INSTALL="make install"

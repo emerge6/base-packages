@@ -1,0 +1,8 @@
+NAME=ncurses
+VERSION=6.4
+DEPENDENCIES=
+SOURCE_URL=https://ftp.gnu.org/gnu/ncurses/ncurses-6.4.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --with-shared --without-debug && make"
+INSTALL="make install"
+

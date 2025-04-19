@@ -1,0 +1,8 @@
+NAME=xf86-video-nouveau
+VERSION=1.0.17
+DEPENDENCIES=xorg-server
+SOURCE_URL=https://www.x.org/releases/individual/driver/xf86-video-nouveau-1.0.17.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"
+

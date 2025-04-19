@@ -1,0 +1,7 @@
+NAME=eudev
+VERSION=3.2.11
+DEPENDENCIES=libffi,util-linux
+SOURCE_URL=https://github.com/gentoo/eudev/archive/refs/tags/v3.2.11.tar.gz
+FETCH_METHOD=curl
+BUILD="./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --with-rootlibdir=/lib && make"
+INSTALL="make install"

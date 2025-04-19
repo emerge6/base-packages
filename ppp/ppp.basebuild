@@ -1,0 +1,7 @@
+NAME=ppp
+VERSION=2.4.9
+DEPENDENCIES=
+SOURCE_URL=https://download.samba.org/pub/ppp/ppp-2.4.9.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"

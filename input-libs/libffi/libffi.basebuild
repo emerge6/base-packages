@@ -1,0 +1,7 @@
+NAME=libffi
+VERSION=3.4.4
+DEPENDENCIES=
+SOURCE_URL=https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --disable-static && make"
+INSTALL="make install"

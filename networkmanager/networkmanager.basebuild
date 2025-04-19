@@ -1,0 +1,7 @@
+NAME=networkmanager
+VERSION=1.52.0
+DEPENDENCIES=libndp,libteam,libpsl,libnm,libmm-glib,iptables,wpa_supplicant,dhcpcd,ppp,bluez
+SOURCE_URL=https://download.gnome.org/sources/NetworkManager/1.52/NetworkManager-1.52.0.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var && make"
+INSTALL="make install"

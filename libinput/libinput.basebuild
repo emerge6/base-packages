@@ -1,0 +1,8 @@
+NAME=libinput
+VERSION=1.25.0
+DEPENDENCIES=libevdev,libudev,mtdev
+SOURCE_URL=https://www.freedesktop.org/software/libinput/libinput-1.25.0.tar.xz
+FETCH_METHOD=curl
+BUILD="meson setup build --prefix=/usr && ninja -C build"
+INSTALL="ninja -C build install"
+

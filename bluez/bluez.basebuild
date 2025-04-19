@@ -1,0 +1,7 @@
+NAME=bluez
+VERSION=5.68
+DEPENDENCIES=
+SOURCE_URL=https://www.kernel.org/pub/linux/bluetooth/bluez-5.68.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"

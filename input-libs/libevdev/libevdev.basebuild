@@ -1,0 +1,7 @@
+NAME=libevdev
+VERSION=1.13.1
+DEPENDENCIES=
+SOURCE_URL=https://www.freedesktop.org/software/libevdev/libevdev-1.13.1.tar.xz
+FETCH_METHOD=curl
+BUILD="meson setup build --prefix=/usr && ninja -C build"
+INSTALL="ninja -C build install"

@@ -1,0 +1,7 @@
+NAME=wpa_supplicant
+VERSION=2.10
+DEPENDENCIES=
+SOURCE_URL=https://w1.fi/releases/wpa_supplicant-2.10.tar.gz
+FETCH_METHOD=curl
+BUILD="cd wpa_supplicant && cp defconfig .config && make"
+INSTALL="make install"

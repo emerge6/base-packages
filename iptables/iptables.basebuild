@@ -1,0 +1,7 @@
+NAME=iptables
+VERSION=1.8.9
+DEPENDENCIES=
+SOURCE_URL=https://www.netfilter.org/projects/iptables/files/iptables-1.8.9.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"

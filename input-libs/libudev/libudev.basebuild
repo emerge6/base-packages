@@ -1,0 +1,7 @@
+NAME=libudev
+VERSION=3.2.11
+DEPENDENCIES=eudev
+SOURCE_URL=
+FETCH_METHOD=skip
+BUILD="echo 'Provided by eudev'"
+INSTALL="true"

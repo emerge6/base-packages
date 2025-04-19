@@ -1,0 +1,7 @@
+NAME=grub
+VERSION=2.12
+DEPENDENCIES=efibootmgr,efivar
+SOURCE_URL=https://ftp.gnu.org/gnu/grub/grub-2.12.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --with-platform=efi --target=x86_64-efi --disable-werror && make"
+INSTALL="make install && grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB && grub-mkconfig -o /boot/grub/grub.cfg"

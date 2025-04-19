@@ -1,0 +1,7 @@
+NAME=efivar
+VERSION=39
+DEPENDENCIES=
+SOURCE_URL=https://github.com/rhboot/efivar/archive/refs/tags/39.tar.gz
+FETCH_METHOD=curl
+BUILD="make"
+INSTALL="make install"

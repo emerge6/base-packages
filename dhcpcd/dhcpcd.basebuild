@@ -1,0 +1,7 @@
+NAME=dhcpcd
+VERSION=9.4.1
+DEPENDENCIES=
+SOURCE_URL=https://roy.marples.name/downloads/dhcpcd/dhcpcd-9.4.1.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"

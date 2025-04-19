@@ -1,0 +1,7 @@
+NAME=libpsl
+VERSION=0.21.1
+DEPENDENCIES=
+SOURCE_URL=https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make install"

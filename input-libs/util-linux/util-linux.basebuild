@@ -1,0 +1,7 @@
+NAME=util-linux
+VERSION=2.39.2
+DEPENDENCIES=
+SOURCE_URL=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.2.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --disable-static && make"
+INSTALL="make install"
