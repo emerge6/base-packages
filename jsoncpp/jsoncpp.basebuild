@@ -1,0 +1,8 @@
+NAME=jsoncpp
+VERSION=1.9.5
+DEPENDENCIES=cmake
+SOURCE_URL=https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.5.tar.gz
+FETCH_METHOD=curl
+BUILD="cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON && cmake --build build"
+INSTALL="cmake --install build"
+
