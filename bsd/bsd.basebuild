@@ -5,3 +5,4 @@ SOURCE_URL=https://opensource.org/licenses/BSD-3-Clause
 FETCH_METHOD=curl
 BUILD="curl -L https://opensource.org/licenses/BSD-3-Clause -o LICENSE"
 INSTALL="echo 'License BSD-3-Clause downloaded successfully'"
+
