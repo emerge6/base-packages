@@ -1,0 +1,8 @@
+NAME=python3
+VERSION=3.12.0
+DEPENDENCIES=libffi zlib libbz2 libncurses-dev libreadline-dev libsqlite3-dev libssl-dev
+SOURCE_URL=https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tgz
+FETCH_METHOD=curl
+BUILD="./configure --enable-optimizations --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

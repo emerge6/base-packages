@@ -1,0 +1,8 @@
+NAME=libtool
+VERSION=2.5.4
+DEPENDENCIES=autoconf automake
+SOURCE_URL=https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make DESTDIR=$DESTDIR install"
+

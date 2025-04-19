@@ -1,0 +1,8 @@
+NAME=libbluetooth
+VERSION=5.70
+DEPENDENCIES=
+SOURCE_URL=https://mirrors.edge.kernel.org/pub/linux/bluetooth/bluez-5.70.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

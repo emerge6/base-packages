@@ -1,0 +1,8 @@
+NAME=java-config
+VERSION=2.3.4
+DEPENDENCIES=python
+SOURCE_URL=https://github.com/gentoo/java-config/archive/refs/tags/2.3.4.tar.gz
+FETCH_METHOD=curl
+BUILD="python setup.py build"
+INSTALL="python setup.py install --root=$DESTDIR"
+

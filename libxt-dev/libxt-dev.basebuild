@@ -1,0 +1,8 @@
+NAME=libxt-dev
+VERSION=1.3.0
+DEPENDENCIES=xproto libx11
+SOURCE_URL=https://www.x.org/releases/individual/lib/libXt-1.3.0.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

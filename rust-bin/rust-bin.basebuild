@@ -1,0 +1,8 @@
+NAME=rust-bin
+VERSION=1.81.0
+DEPENDENCIES=
+SOURCE_URL=https://static.rust-lang.org/dist/rust-1.81.0-x86_64-unknown-linux-gnu.tar.gz
+FETCH_METHOD=curl
+BUILD=""
+INSTALL="./install.sh --prefix=/usr --destdir=$DESTDIR"
+

@@ -1,0 +1,8 @@
+NAME=automake
+VERSION=1.17
+DEPENDENCIES=autoconf
+SOURCE_URL=https://ftp.gnu.org/gnu/automake/automake-1.17.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make DESTDIR=$DESTDIR install"
+

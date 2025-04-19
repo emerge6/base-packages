@@ -1,0 +1,8 @@
+NAME=linux
+VERSION=latest
+DEPENDENCIES=git build-essential libncurses-dev bison flex libssl-dev libelf-dev bc
+SOURCE_URL=https://github.com/emerge6/linux.git
+FETCH_METHOD=git
+BUILD="make defconfig && make -j$(nproc)"
+INSTALL="make modules_install && make install && update-initramfs -c -k $(make kernelrelease) && echo 'Update your grub config'"
+

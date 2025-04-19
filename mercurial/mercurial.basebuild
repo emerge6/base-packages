@@ -1,0 +1,8 @@
+NAME=mercurial
+VERSION=6.6.1
+DEPENDENCIES=python3
+SOURCE_URL=https://www.mercurial-scm.org/release/mercurial-6.6.1.tar.gz
+FETCH_METHOD=curl
+BUILD="python3 setup.py build"
+INSTALL="python3 setup.py install"
+

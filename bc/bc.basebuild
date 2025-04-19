@@ -1,0 +1,8 @@
+NAME=bc
+VERSION=1.07.1
+DEPENDENCIES=
+SOURCE_URL=https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

@@ -1,0 +1,8 @@
+NAME=kmod
+VERSION=30
+DEPENDENCIES=zlib xz
+SOURCE_URL=https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-30.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

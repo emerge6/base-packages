@@ -1,0 +1,8 @@
+NAME=libssl
+VERSION=3.1.1
+DEPENDENCIES=perl
+SOURCE_URL=https://www.openssl.org/source/openssl-3.1.1.tar.gz
+FETCH_METHOD=curl
+BUILD="./Configure linux-x86_64 --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

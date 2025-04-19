@@ -1,0 +1,8 @@
+NAME=libpulse
+VERSION=16.1
+DEPENDENCIES=glib2 dbus
+SOURCE_URL=https://freedesktop.org/software/pulseaudio/releases/pulseaudio-16.1.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

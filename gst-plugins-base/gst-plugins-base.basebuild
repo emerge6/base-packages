@@ -1,0 +1,8 @@
+NAME=gst-plugins-base
+VERSION=1.24.0
+DEPENDENCIES=gstreamer
+SOURCE_URL=https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.24.0.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

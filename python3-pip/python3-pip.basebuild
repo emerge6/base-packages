@@ -1,0 +1,8 @@
+NAME=python3-pip
+VERSION=24.0
+DEPENDENCIES=python3
+SOURCE_URL=https://files.pythonhosted.org/packages/source/p/pip/pip-24.0.tar.gz
+FETCH_METHOD=curl
+BUILD="python3 setup.py build"
+INSTALL="python3 setup.py install"
+

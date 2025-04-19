@@ -1,0 +1,8 @@
+NAME=make
+VERSION=4.4.1
+DEPENDENCIES=
+SOURCE_URL=https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make DESTDIR=$DESTDIR install"
+

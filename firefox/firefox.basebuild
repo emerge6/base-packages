@@ -1,0 +1,8 @@
+NAME=firefox
+VERSION=latest
+DEPENDENCIES=autoconf2.13 python3 python3-pip mercurial yasm libgtk-3-dev libdbus-glib-1-dev libxt-dev libx11-dev libxrender-dev libxcomposite-dev libxdamage-dev libxfixes-dev libxrandr-dev libasound2-dev libpulse-dev libvpx-dev libjpeg-dev libpng-dev libwebp-dev libffi-dev libevent-dev
+SOURCE_URL=https://hg.mozilla.org/mozilla-central
+FETCH_METHOD=hg
+BUILD="./mach build"
+INSTALL="./mach install"
+

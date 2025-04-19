@@ -1,0 +1,8 @@
+NAME=pipewire
+VERSION=0.3.47
+DEPENDENCIES=meson ninja gcc glib2 dbus libpulse libbluetooth gstreamer gst-plugins-base libva ffmpeg v4l-utils
+SOURCE_URL=https://github.com/PipeWire/pipewire/archive/refs/tags/0.3.47.tar.gz
+FETCH_METHOD=curl
+BUILD="meson setup build && meson compile -C build"
+INSTALL="meson install -C build"
+

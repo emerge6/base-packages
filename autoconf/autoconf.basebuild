@@ -1,0 +1,8 @@
+NAME=autoconf
+VERSION=2.13
+DEPENDENCIES=
+SOURCE_URL=https://ftp.gnu.org/gnu/autoconf/autoconf-2.13.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make DESTDIR=$DESTDIR install"
+

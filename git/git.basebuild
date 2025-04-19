@@ -1,0 +1,8 @@
+NAME=git
+VERSION=2.42.0
+DEPENDENCIES=curl openssl zlib
+SOURCE_URL=https://github.com/git/git/archive/refs/tags/v2.42.0.tar.gz
+FETCH_METHOD=curl
+BUILD="make configure && ./configure --prefix=/usr && make all -j$(nproc)"
+INSTALL="make install"
+

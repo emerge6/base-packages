@@ -1,0 +1,8 @@
+NAME=dbus
+VERSION=1.14.6
+DEPENDENCIES=expat
+SOURCE_URL=https://dbus.freedesktop.org/releases/dbus/dbus-1.14.6.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --sysconfdir=/etc && make -j$(nproc)"
+INSTALL="make install"
+

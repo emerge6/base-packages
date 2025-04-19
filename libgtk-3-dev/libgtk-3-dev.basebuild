@@ -1,0 +1,8 @@
+NAME=libgtk-3-dev
+VERSION=3.24.41
+DEPENDENCIES=glib2 cairo pango atk gdk-pixbuf
+SOURCE_URL=https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.41.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

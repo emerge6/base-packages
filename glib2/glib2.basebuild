@@ -1,0 +1,8 @@
+NAME=glib2
+VERSION=2.76.1
+DEPENDENCIES=libffi zlib
+SOURCE_URL=https://download.gnome.org/sources/glib/2.76/glib-2.76.1.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

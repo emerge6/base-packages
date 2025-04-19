@@ -1,0 +1,8 @@
+NAME=meson
+VERSION=1.7.0
+DEPENDENCIES=python
+SOURCE_URL=https://github.com/mesonbuild/meson/releases/download/1.7.0/meson-1.7.0.tar.gz
+FETCH_METHOD=curl
+BUILD="python setup.py build"
+INSTALL="python setup.py install --root=$DESTDIR"
+

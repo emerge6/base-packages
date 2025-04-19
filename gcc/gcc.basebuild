@@ -1,0 +1,8 @@
+NAME=gcc
+VERSION=13.2.0
+DEPENDENCIES=mpfr gmp mpc isl zlib
+SOURCE_URL=https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.gz
+FETCH_METHOD=curl
+BUILD="./configure --disable-multilib --enable-languages=c,c++ --prefix=/usr && make -j$(nproc)"
+INSTALL="make install"
+

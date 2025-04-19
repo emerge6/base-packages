@@ -1,0 +1,8 @@
+NAME=ffmpeg
+VERSION=6.1.1
+DEPENDENCIES=yasm
+SOURCE_URL=https://ffmpeg.org/releases/ffmpeg-6.1.1.tar.xz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr --enable-shared && make -j$(nproc)"
+INSTALL="make install"
+

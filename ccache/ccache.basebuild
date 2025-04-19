@@ -1,0 +1,8 @@
+NAME=ccache
+VERSION=4.10.2
+DEPENDENCIES=cmake
+SOURCE_URL=https://github.com/ccache/ccache/releases/download/v4.10.2/ccache-4.10.2.tar.gz
+FETCH_METHOD=curl
+BUILD="cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build"
+INSTALL="cmake --install build --prefix=/usr --install-dir=$DESTDIR"
+

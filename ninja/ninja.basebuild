@@ -1,0 +1,8 @@
+NAME=ninja
+VERSION=1.11.1
+DEPENDENCIES=python3
+SOURCE_URL=https://github.com/ninja-build/ninja/archive/v1.11.1.tar.gz
+FETCH_METHOD=curl
+BUILD="python3 configure.py --bootstrap"
+INSTALL="cp ninja /usr/bin/"
+

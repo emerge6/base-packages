@@ -1,0 +1,8 @@
+NAME=python
+VERSION=3.12.10
+DEPENDENCIES=make
+SOURCE_URL=https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tgz
+FETCH_METHOD=curl
+BUILD="./configure --prefix=/usr && make"
+INSTALL="make DESTDIR=$DESTDIR install"
+
