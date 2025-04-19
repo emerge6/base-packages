@@ -1,0 +1,7 @@
+NAME=mit
+VERSION=1.0
+DEPENDENCIES=
+SOURCE_URL=https://opensource.org/licenses/MIT
+FETCH_METHOD=curl
+BUILD="curl -L https://opensource.org/licenses/MIT -o LICENSE"
+INSTALL="echo 'License MIT downloaded successfully'"

@@ -1,0 +1,7 @@
+NAME=gpl3
+VERSION=1.0
+DEPENDENCIES=
+SOURCE_URL=https://www.gnu.org/licenses/gpl-3.0.txt
+FETCH_METHOD=curl
+BUILD="curl -L https://www.gnu.org/licenses/gpl-3.0.txt -o LICENSE"
+INSTALL="echo 'License GPL-3.0 downloaded successfully'"
