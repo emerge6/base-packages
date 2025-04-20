@@ -1,7 +1,121 @@
-NAME=cmake
-VERSION=3.30.5
-DEPENDENCIES=
-SOURCE_URL=https://github.com/Kitware/CMake/releases/download/v3.30.5/cmake-3.30.5.tar.gz
-FETCH_METHOD=wget
-BUILD=./bootstrap --prefix=/usr && make -j$(nproc)
-INSTALL=make install
+#!/bin/bash
+
+# Основные метаданные пакета
+PKG_NAME="cmake"
+PKG_VERSION="3.10.0"
+PKG_SRC_URL="https://github.com/Kitware/CMake/releases/download/v3.10.0/cmake-3.10.0.tar.gz"
+PKG_CHECKSUM="sha256:141085a9d8f7e6f75fb5c9b6b3b06dc38158ca0efcd21786f0b2b9a253d19e14"
+PKG_ARCHITECTURE="amd64"
+PKG_LICENSE="BSD"
+PKG_DEPENDENCIES=""
+PKG_FETCH_METHOD="wget"
+PKG_INSTALL_DIR="/usr/local"
+PKG_BUILD_DIR="cmake-3.10.0"
+
+# Проверка контрольной суммы
+verify_checksum() {
+    if [ -n "$PKG_CHECKSUM" ]; then
+        echo "Checking checksum..."
+        local checksum_type=$(echo $PKG_CHECKSUM | cut -d: -f1)
+        local checksum_value=$(echo $PKG_CHECKSUM | cut -d: -f2)
+        local file="/tmp/$PKG_NAME-$PKG_VERSION.tar.gz"
+        if [ "$checksum_type" = "sha256" ]; then
+            if ! echo "$checksum_value $file" | sha256sum -c - >/dev/null; then
+                echo "Error: Checksum mismatch!"
+                exit 1
+            fi
+            echo "Checksum verified."
+        else
+            echo "Unsupported checksum type: $checksum_type"
+            exit 1
+        fi
+    fi
+}
+
+# Разрешение зависимостей
+resolve_dependencies() {
+    if [ -n "$PKG_DEPENDENCIES" ]; then
+        echo "Resolving dependencies..."
+        for dep in $PKG_DEPENDENCIES; do
+            local dep_name=$(echo $dep | cut -d: -f1)
+            local dep_version=$(echo $dep | cut -d: -f2)
+            echo "Checking dependency: $dep_name version $dep_version"
+        done
+    else
+        echo "No dependencies."
+    fi
+}
+
+# Фаза распаковки
+unpack_stage() {
+    echo "Unpacking sources to $PKG_BUILD_DIR..."
+    mkdir -p "/tmp/$PKG_BUILD_DIR"
+    cd "/tmp/$PKG_BUILD_DIR" || exit 1
+    if ! wget -q "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
+        echo "Error downloading sources from $PKG_SRC_URL"
+        exit 1
+    fi
+    verify_checksum
+    tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
+    echo "Unpacking completed."
+}
+
+# Фаза компиляции
+compile_stage() {
+    echo "Compiling package..."
+    cd "/tmp/$PKG_BUILD_DIR" || exit 1
+    ./bootstrap --prefix="$PKG_INSTALL_DIR" || exit 1
+    make -j$(nproc) || exit 1
+    echo "Compilation completed."
+}
+
+# Фаза установки
+install_stage() {
+    echo "Installing package to $PKG_INSTALL_DIR..."
+    cd "/tmp/$PKG_BUILD_DIR" || exit 1
+    make install || exit 1
+    echo "Installation completed."
+}
+
+# Общая стадия
+default() {
+    echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
+    resolve_dependencies
+    unpack_stage
+    compile_stage
+    install_stage
+}
+
+# Эмулятор команд
+emake() {
+    case "$1" in
+        "unpack")
+            unpack_stage
+            ;;
+        "compile")
+            compile_stage
+            ;;
+        "install")
+            install_stage
+            ;;
+        *)
+            echo "Unknown command: $1"
+            exit 1
+            ;;
+    esac
+}
+
+# Обработка ошибок
+handle_error() {
+    echo "Error: Build or installation process failed."
+    exit 1
+}
+
+# Главная функция
+main() {
+    trap 'handle_error' ERR
+    emake "$1"
+}
+
+# Запуск
+main "$@"
