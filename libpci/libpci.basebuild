@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Основные метаданные пакета
 PKG_NAME="libpci"
 PKG_VERSION="3.8.0"
 PKG_SRC_URL="https://github.com/pciutils/pciutils/archive/refs/tags/v3.8.0.tar.gz"
@@ -11,7 +10,6 @@ PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
 PKG_BUILD_DIR="pciutils-3.8.0"
 
-# Разрешение зависимостей
 resolve_dependencies() {
     if [ -n "$PKG_DEPENDENCIES" ]; then
         echo "Resolving dependencies..."
@@ -25,7 +23,6 @@ resolve_dependencies() {
     fi
 }
 
-# Фаза распаковки
 unpack_stage() {
     echo "Unpacking sources to $PKG_BUILD_DIR..."
     mkdir -p "/tmp/$PKG_BUILD_DIR"
@@ -38,7 +35,6 @@ unpack_stage() {
     echo "Unpacking completed."
 }
 
-# Фаза компиляции
 compile_stage() {
     echo "Compiling package..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
@@ -54,7 +50,6 @@ install_stage() {
     echo "Installation completed."
 }
 
-# Общая стадия
 default() {
     echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
     resolve_dependencies
@@ -63,7 +58,6 @@ default() {
     install_stage
 }
 
-# Эмулятор команд
 emake() {
     case "$1" in
         "unpack")
@@ -82,17 +76,14 @@ emake() {
     esac
 }
 
-# Обработка ошибок
 handle_error() {
     echo "Error: Build or installation process failed."
     exit 1
 }
 
-# Главная функция
 main() {
     trap 'handle_error' ERR
     emake "$1"
 }
-
-# Запуск
+# run
 main "$@"
