@@ -1,7 +1,143 @@
-NAME=fastfetch
-VERSION=2.40.4
-DEPENDENCIES=
-SOURCE_URL=https://github.com/fastfetch-cli/fastfetch/archive/refs/tags/2.40.4.tar.gz
-FETCH_METHOD=curl
-BUILD="cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build"
-INSTALL="cmake --install build"
+#!/bin/bash
+
+# Метаданные пакета fastfetch
+PKG_NAME="fastfetch"
+PKG_VERSION="2.14.1"
+PKG_SRC_URL="https://github.com/fastfetch-cli/fastfetch/archive/refs/tags/${PKG_VERSION}.tar.gz"
+PKG_ARCHITECTURE="amd64"
+PKG_LICENSE="MIT"
+PKG_DEPENDENCIES="cmake:3.20.0 pkg-config:0.29.2 glibc:2.35"
+PKG_FETCH_METHOD="git"
+PKG_INSTALL_DIR="/usr/local"
+PKG_BUILD_DIR="$PKG_NAME-$PKG_VERSION"
+PKG_OPTIONAL_DEPS="vulkan:1.3.0 x11:1.8.0 wayland:1.21.0 pulseaudio:16.1 imagemagick:7.1.0 chafa:1.12.0"
+
+# Проверка и установка зависимостей
+resolve_dependencies() {
+    echo "Проверка зависимостей для $PKG_NAME..."
+    
+    # Обязательные зависимости
+    local req_deps=(
+        "cmake"
+        "pkg-config"
+        "git"
+        "gcc"
+        "make"
+    )
+    
+    for dep in "${req_deps[@]}"; do
+        if ! command -v "$dep" &>/dev/null; then
+            echo "Ошибка: $dep не установлен. Установите пакет $dep."
+            exit 1
+        fi
+        echo "Найдено: $dep ($($dep --version | head -n 1))"
+    done
+    
+    # Проверка библиотек через pkg-config
+    local lib_deps=(
+        "glib-2.0"
+        "vulkan"
+        "x11"
+        "wayland-client"
+        "pulse"
+        "MagickWand"
+        "chafa"
+    )
+    
+    for lib in "${lib_deps[@]}"; do
+        if pkg-config --exists "$lib"; then
+            version=$(pkg-config --modversion "$lib")
+            echo "Найдена библиотека: $lib ($version)"
+        else
+            echo "Предупреждение: библиотека $lib не найдена (некоторые функции будут отключены)"
+        fi
+    done
+}
+
+# Загрузка исходников
+fetch_sources() {
+    echo "Загрузка исходников fastfetch $PKG_VERSION..."
+    if [ ! -d "$PKG_BUILD_DIR" ]; then
+        if ! wget -q "$PKG_SRC_URL" -O "${PKG_NAME}.tar.gz"; then
+            echo "Ошибка загрузки исходников"
+            exit 1
+        fi
+        tar -xzf "${PKG_NAME}.tar.gz" || exit 1
+        mv "${PKG_NAME}-${PKG_VERSION}" "$PKG_BUILD_DIR"
+    fi
+    cd "$PKG_BUILD_DIR" || exit 1
+}
+
+# Конфигурация сборки
+configure_build() {
+    echo "Конфигурация сборки..."
+    local cmake_options=(
+        "-DCMAKE_BUILD_TYPE=Release"
+        "-DCMAKE_INSTALL_PREFIX=${PKG_INSTALL_DIR}"
+        "-DFASTFETCH_BUILD_WITH_RPM=ON"
+        "-DFASTFETCH_BUILD_WITH_DEB=ON"
+    )
+    
+    # Автоматическое определение доступных функций
+    if pkg-config --exists "vulkan"; then
+        cmake_options+=("-DFASTFETCH_BUILD_WITH_VULKAN=ON")
+    fi
+    
+    if pkg-config --exists "x11"; then
+        cmake_options+=("-DFASTFETCH_BUILD_WITH_X11=ON")
+    fi
+    
+    cmake "${cmake_options[@]}" . || exit 1
+}
+
+# Компиляция
+compile() {
+    echo "Компиляция fastfetch..."
+    make -j$(nproc) || exit 1
+}
+
+# Установка
+install() {
+    echo "Установка fastfetch..."
+    sudo make install || exit 1
+    echo "fastfetch успешно установлен в ${PKG_INSTALL_DIR}/bin/fastfetch"
+}
+
+# Очистка
+cleanup() {
+    echo "Очистка временных файлов..."
+    rm -rf "${PKG_NAME}.tar.gz" "$PKG_BUILD_DIR"
+}
+
+# Основной процесс сборки
+build_package() {
+    resolve_dependencies
+    fetch_sources
+    configure_build
+    compile
+    install
+    cleanup
+}
+
+# Обработка команд
+case "$1" in
+    "build")
+        build_package
+        ;;
+    "deps")
+        resolve_dependencies
+        ;;
+    "clean")
+        cleanup
+        ;;
+    *)
+        echo "Использование: $0 [команда]"
+        echo "Команды:"
+        echo "  build - собрать и установить пакет"
+        echo "  deps  - проверить зависимости"
+        echo "  clean - очистить временные файлы"
+        exit 1
+        ;;
+esac
+
+exit 0
