@@ -1,8 +1,7 @@
 NAME=libelf
-VERSION=0.8.13
+VERSION=0.189
 DEPENDENCIES=
-SOURCE_URL=https://sourceware.org/elfutils/ftp/0.8.13/elfutils-0.8.13.tar.bz2
-FETCH_METHOD=curl
-BUILD="./configure --prefix=/usr && make -j$(nproc)"
-INSTALL="make install"
-
+SOURCE_URL=https://sourceware.org/elfutils/ftp/0.189/elfutils-0.189.tar.bz2
+FETCH_METHOD=wget
+BUILD=tar -xjf elfutils-0.189.tar.bz2 && cd elfutils-0.189 && ./configure --prefix=/usr && make
+INSTALL=make DESTDIR=$DESTDIR install
