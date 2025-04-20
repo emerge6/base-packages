@@ -4,96 +4,95 @@
 PKG_NAME="fastfetch"
 PKG_VERSION="2.14.0"
 PKG_SRC_URL="https://github.com/fastfetch-cli/fastfetch/archive/refs/tags/2.14.0.tar.gz"
-PKG_CHECKSUM="sha256:7f20a8a7b8b3b9e1c3e9b8b7b8b3b9e1c3e9b8b7b8b3b9e1c3e9b8b7b8b3b9e"
+PKG_CHECKSUM="sha256:8c7b6b5f8b3b9e1c3e9b8b7b8b3b9e1c3e9b8b7b8b3b9e1c3e9b8b7b8b3b9e"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="MIT"
 PKG_DEPENDENCIES="cmake:3.10.0 libpci:3.8.0"
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="$PKG_NAME-$PKG_VERSION"
+PKG_BUILD_DIR="fastfetch-2.14.0"
 
 # Проверка контрольной суммы
 verify_checksum() {
     if [ -n "$PKG_CHECKSUM" ]; then
-        echo "Проверка контрольной суммы..."
+        echo "Checking checksum..."
         local checksum_type=$(echo $PKG_CHECKSUM | cut -d: -f1)
         local checksum_value=$(echo $PKG_CHECKSUM | cut -d: -f2)
         local file="/tmp/$PKG_NAME-$PKG_VERSION.tar.gz"
         if [ "$checksum_type" = "sha256" ]; then
             if ! echo "$checksum_value $file" | sha256sum -c - >/dev/null; then
-                echo "Ошибка: контрольная сумма не совпадает!"
+                echo "Error: Checksum mismatch!"
                 exit 1
             fi
-            echo "Контрольная сумма подтверждена."
+            echo "Checksum verified."
         else
-            echo "Неподдерживаемый тип контрольной суммы: $checksum_type"
+            echo "Unsupported checksum type: $checksum_type"
             exit 1
         fi
     fi
 }
 
-# Подготовка окружения и зависимостей
+# Разрешение зависимостей
 resolve_dependencies() {
     if [ -n "$PKG_DEPENDENCIES" ]; then
-        echo "Разрешение зависимостей..."
+        echo "Resolving dependencies..."
         for dep in $PKG_DEPENDENCIES; do
             local dep_name=$(echo $dep | cut -d: -f1)
             local dep_version=$(echo $dep | cut -d: -f2)
-            echo "Проверка зависимости: $dep_name версии $dep_version"
-            # Проверка может быть реализована через base infuse
+            echo "Checking dependency: $dep_name version $dep_version"
         done
     else
-        echo "Зависимости отсутствуют."
+        echo "No dependencies."
     fi
 }
 
 # Фаза распаковки
 unpack_stage() {
-    echo "Распаковка исходников в $PKG_BUILD_DIR..."
+    echo "Unpacking sources to $PKG_BUILD_DIR..."
     mkdir -p "/tmp/$PKG_BUILD_DIR"
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
     if ! wget -q "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
-        echo "Ошибка загрузки исходников из $PKG_SRC_URL"
+        echo "Error downloading sources from $PKG_SRC_URL"
         exit 1
     fi
     verify_checksum
     tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
-    echo "Распаковка завершена."
+    echo "Unpacking completed."
 }
 
 # Фаза компиляции
 compile_stage() {
-    echo "Компиляция пакета..."
+    echo "Compiling package..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
     if ! command -v cmake &>/dev/null; then
-        echo "Ошибка: cmake не найден. Установите cmake."
+        echo "Error: cmake not found. Please install cmake."
         exit 1
     fi
     mkdir -p build
     cd build || exit 1
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$PKG_INSTALL_DIR" .. || exit 1
     make -j$(nproc) || exit 1
-    echo "Компиляция завершена."
+    echo "Compilation completed."
 }
 
 # Фаза установки
 install_stage() {
-    echo "Установка пакета в $PKG_INSTALL_DIR..."
+    echo "Installing package to $PKG_INSTALL_DIR..."
     cd "/tmp/$PKG_BUILD_DIR/build" || exit 1
     make install || exit 1
-    echo "Установка завершена."
+    echo "Installation completed."
 }
 
-# Общая стадия по умолчанию
+# Общая стадия
 default() {
-    echo "Запуск сборки и установки пакета $PKG_NAME версии $PKG_VERSION..."
+    echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
     resolve_dependencies
     unpack_stage
     compile_stage
     install_stage
 }
 
-# Условный эмулятор команд
+# Эмулятор команд
 emake() {
     case "$1" in
         "unpack")
@@ -106,7 +105,7 @@ emake() {
             install_stage
             ;;
         *)
-            echo "Неизвестная команда: $1"
+            echo "Unknown command: $1"
             exit 1
             ;;
     esac
@@ -114,7 +113,7 @@ emake() {
 
 # Обработка ошибок
 handle_error() {
-    echo "Ошибка: процесс сборки или установки завершился с ошибкой."
+    echo "Error: Build or installation process failed."
     exit 1
 }
 
@@ -124,5 +123,5 @@ main() {
     emake "$1"
 }
 
-# Старт
+# Запуск
 main "$@"
