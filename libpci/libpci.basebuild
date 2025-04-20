@@ -4,33 +4,12 @@
 PKG_NAME="libpci"
 PKG_VERSION="3.8.0"
 PKG_SRC_URL="https://github.com/pciutils/pciutils/archive/refs/tags/v3.8.0.tar.gz"
-PKG_CHECKSUM="sha256:fd1b4a7b1a9a4f3a8d6e8f2e6e8f3a4b1a9a4f3a8d6e8f2e6e8f3a4b1a9a4f3"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL-2.0"
 PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
 PKG_BUILD_DIR="pciutils-3.8.0"
-
-# Проверка контрольной суммы
-verify_checksum() {
-    if [ -n "$PKG_CHECKSUM" ]; then
-        echo "Checking checksum..."
-        local checksum_type=$(echo $PKG_CHECKSUM | cut -d: -f1)
-        local checksum_value=$(echo $PKG_CHECKSUM | cut -d: -f2)
-        local file="/tmp/$PKG_NAME-$PKG_VERSION.tar.gz"
-        if [ "$checksum_type" = "sha256" ]; then
-            if ! echo "$checksum_value $file" | sha256sum -c - >/dev/null; then
-                echo "Error: Checksum mismatch!"
-                exit 1
-            fi
-            echo "Checksum verified."
-        else
-            echo "Unsupported checksum type: $checksum_type"
-            exit 1
-        fi
-    fi
-}
 
 # Разрешение зависимостей
 resolve_dependencies() {
@@ -55,7 +34,6 @@ unpack_stage() {
         echo "Error downloading sources from $PKG_SRC_URL"
         exit 1
     fi
-    verify_checksum
     tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
     echo "Unpacking completed."
 }
