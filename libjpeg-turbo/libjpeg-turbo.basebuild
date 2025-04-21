@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Основные метаданные пакета
-PKG_NAME="kmod"
-PKG_VERSION="30"
-PKG_SRC_URL="https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-30.tar.gz"
+PKG_NAME="libjpeg-turbo"
+PKG_VERSION="3.0.0"
+PKG_SRC_URL="https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.0.0/libjpeg-turbo-3.0.0.tar.gz"
 PKG_ARCHITECTURE="amd64"
-PKG_LICENSE="GPL-2.0"
-PKG_DEPENDENCIES="zlib:1.3.1"
+PKG_LICENSE="IJG"
+PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="kmod-30"
+PKG_BUILD_DIR="libjpeg-turbo-3.0.0"
 
 # Разрешение зависимостей
 resolve_dependencies() {
@@ -42,7 +42,7 @@ unpack_stage() {
 compile_stage() {
     echo "Compiling package..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    ./configure --prefix="$PKG_INSTALL_DIR" || exit 1
+    cmake -DCMAKE_INSTALL_PREFIX="$PKG_INSTALL_DIR" . || exit 1
     make -j$(nproc) || exit 1
     echo "Compilation completed."
 }

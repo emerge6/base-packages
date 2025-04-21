@@ -1,8 +1,136 @@
-NAME=linux
-VERSION=latest
-DEPENDENCIES=git build-essential ncurses bison flex libssl libelf bc
-SOURCE_URL=https://github.com/emerge6/linux.git
-FETCH_METHOD=git
-BUILD="make defconfig && make -j$(nproc)"
-INSTALL="make modules_install && make install && update-initramfs -c -k $(make kernelrelease) && echo 'Update your grub config'"
+#!/bin/bash
 
+# Основные метаданные пакета
+PKG_NAME="linux"
+PKG_VERSION="6.14"
+PKG_SRC_URL="https://github.com/emerge6/linux/archive/refs/heads/main.tar.gz"
+PKG_ARCHITECTURE="amd64"
+PKG_LICENSE="GPL-2.0"
+PKG_DEPENDENCIES="bc:1.07.1 kmod:30 util-linux:2.39.3 openssl:3.1.4 gcc:13.2.0 binutils:2.41 make:4.4.1 busybox:1.36.1"
+PKG_FETCH_METHOD="wget"
+PKG_INSTALL_DIR="/usr"
+PKG_BUILD_DIR="linux"
+
+# Разрешение зависимостей
+resolve_dependencies() {
+    if [ -n "$PKG_DEPENDENCIES" ]; then
+        echo "Resolving dependencies..."
+        for dep in $PKG_DEPENDENCIES; do
+            local dep_name=$(echo $dep | cut -d: -f1)
+            local dep_version=$(echo $dep | cut -d: -f2)
+            echo "Checking dependency: $dep_name version $dep_version"
+        done
+    else
+        echo "No dependencies."
+    fi
+}
+
+# Фаза распаковки
+unpack_stage() {
+    echo "Unpacking sources to /usr/src/$PKG_BUILD_DIR..."
+    mkdir -p "/usr/src/$PKG_BUILD_DIR"
+    cd "/usr/src/$PKG_BUILD_DIR" || exit 1
+    if ! wget -q "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
+        echo "Error downloading sources from $PKG_SRC_URL"
+        exit 1
+    fi
+    tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
+    rm "$PKG_NAME-$PKG_VERSION.tar.gz"
+    echo "Unpacking completed."
+}
+
+# Фаза компиляции
+compile_stage() {
+    echo "Compiling package in /usr/src/$PKG_BUILD_DIR..."
+    cd "/usr/src/$PKG_BUILD_DIR" || exit 1
+    # Создание базовой конфигурации ядра
+    make defconfig || exit 1
+    # Компиляция ядра и модулей
+    make -j$(nproc) || exit 1
+    echo "Compilation completed."
+}
+
+# Фаза установки
+install_stage() {
+    echo "Installing package..."
+    cd "/usr/src/$PKG_BUILD_DIR" || exit 1
+    # Установка ядра в /boot и модулей в /lib/modules
+    make install INSTALL_PATH="/boot" || exit 1
+    make modules_install INSTALL_MOD_PATH="/lib" || exit 1
+    # Копирование конфигурации ядра
+    cp .config "/boot/config-$PKG_VERSION" || exit 1
+
+    # Создание initramfs
+    echo "Creating initramfs..."
+    mkdir -p /tmp/initramfs
+    cd /tmp/initramfs
+    mkdir -p bin sbin etc dev proc sys usr/bin usr/sbin
+    cp /bin/busybox bin/
+    ln -s busybox bin/sh
+    ln -s busybox bin/mount
+    ln -s busybox bin/mknod
+    # Создание init скрипта
+    cat > init << 'EOF'
+#!/bin/sh
+mount -t devtmpfs devtmpfs /dev
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+modprobe ext4
+modprobe virtio_blk
+mount -o ro /dev/sda1 /mnt
+exec switch_root /mnt /sbin/init
+EOF
+    chmod +x init
+    # Копирование модулей ядра
+    mkdir -p lib/modules/$PKG_VERSION
+    cp -r /lib/modules/$PKG_VERSION/kernel/fs/ext4 lib/modules/$PKG_VERSION/
+    cp -r /lib/modules/$PKG_VERSION/kernel/drivers/block/virtio_blk.ko lib/modules/$PKG_VERSION/
+    # Создание архива initramfs
+    find . | cpio -o -H newc | gzip > /boot/initramfs-$PKG_VERSION.img
+    rm -rf /tmp/initramfs
+    echo "Initramfs created at /boot/initramfs-$PKG_VERSION.img"
+    echo "Installation completed."
+}
+
+# Общая стадия
+default() {
+    echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
+    resolve_dependencies
+    unpack_stage
+    compile_stage
+    install_stage
+}
+
+# Эмулятор команд
+emake() {
+    case "$1" in
+        "unpack")
+            unpack_stage
+            ;;
+        "compile")
+            compile_stage
+            ;;
+        "install")
+            install_stage
+            ;;
+        *)
+            echo "Unknown command: $1"
+            exit 1
+            ;;
+    esac
+}
+
+# Обработка ошибок
+handle_error() {
+    echo "Error: Build or installation process failed."
+    exit 1
+}
+
+# Главная функция
+main() {
+    trap 'handle_error' ERR
+    emake "$1"
+}
+
+# Запуск
+main "$@"
