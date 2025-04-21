@@ -2,14 +2,14 @@
 
 # Основные метаданные пакета
 PKG_NAME="bash"
-PKG_VERSION="5.2"
-PKG_SRC_URL="https://ftp.gnu.org/gnu/bash/bash-5.2.tar.gz"
+PKG_VERSION="5.2.15"
+PKG_SRC_URL="https://ftp.gnu.org/gnu/bash/bash-5.2.15.tar.gz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL-3.0"
-PKG_DEPENDENCIES="ncurses:6.3"
+PKG_DEPENDENCIES="ncurses:6.4"
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="bash-5.2"
+PKG_BUILD_DIR="bash-5.2.15"
 
 # Разрешение зависимостей
 resolve_dependencies() {
@@ -42,7 +42,7 @@ unpack_stage() {
 compile_stage() {
     echo "Compiling package..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    ./configure --prefix="$PKG_INSTALL_DIR" --with-curses || exit 1
+    ./configure --prefix="$PKG_INSTALL_DIR" || exit 1
     make -j$(nproc) || exit 1
     echo "Compilation completed."
 }
