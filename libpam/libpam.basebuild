@@ -1,15 +1,17 @@
 #!/bin/bash
 
+# Основные метаданные пакета
 PKG_NAME="libpam"
 PKG_VERSION="1.5.3"
 PKG_SRC_URL="https://github.com/linux-pam/linux-pam/archive/refs/tags/v$PKG_VERSION.tar.gz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="BSD-3-Clause"
-PKG_DEPENDENCIES="zlib:1.3.1 gcc:14.2.0 make:4.4.1 binutils:2.41"
+PKG_DEPENDENCIES="zlib:1.3.1 gcc:14.2.0 make:4.4.1 binutils:2.41 flex:2.6.4 bison:3.8.2"
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
 PKG_BUILD_DIR="tmp/$PKG_NAME-$PKG_VERSION"
-# ЕБАЛ Я БЛЯТЬ С ЭТОЙ ХУЙНЕЙ ТУПОРЫЛОЙ ЕБАТЬСЯ СУКАААА
+
+# Разрешение зависимостей
 resolve_dependencies() {
     if [ -n "$PKG_DEPENDENCIES" ]; then
         echo "Resolving dependencies..."
@@ -23,6 +25,7 @@ resolve_dependencies() {
     fi
 }
 
+# Фаза распаковки
 unpack_stage() {
     echo "Unpacking sources to /$PKG_BUILD_DIR..."
     mkdir -p "/$PKG_BUILD_DIR"
@@ -44,6 +47,7 @@ unpack_stage() {
     echo "Unpacking completed."
 }
 
+# Фаза компиляции
 compile_stage() {
     echo "Compiling package in /$PKG_BUILD_DIR..."
     cd "/$PKG_BUILD_DIR" || exit 1
@@ -63,6 +67,7 @@ compile_stage() {
     echo "Compilation completed."
 }
 
+# Фаза установки
 install_stage() {
     echo "Installing package to $PKG_INSTALL_DIR..."
     cd "/$PKG_BUILD_DIR" || exit 1
@@ -73,6 +78,7 @@ install_stage() {
     echo "Installation completed."
 }
 
+# Общая стадия
 default() {
     echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
     resolve_dependencies
@@ -81,6 +87,7 @@ default() {
     install_stage
 }
 
+# Эмулятор команд
 emake() {
     case "$1" in
         "unpack")
@@ -99,14 +106,17 @@ emake() {
     esac
 }
 
+# Обработка ошибок
 handle_error() {
     echo "Error: Build or installation process failed."
     exit 1
 }
 
+# Главная функция
 main() {
     trap 'handle_error' ERR
     emake "$1"
 }
 
+# Запуск
 main "$@"
