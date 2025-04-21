@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Основные метаданные пакета
-PKG_NAME="popt"
-PKG_VERSION="1.19"
-PKG_SRC_URL="http://rpm5.org/files/popt/popt-1.19.tar.gz"
+PKG_NAME="freetype2"
+PKG_VERSION="2.13.2"
+PKG_SRC_URL="https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.gz"
 PKG_ARCHITECTURE="amd64"
-PKG_LICENSE="MIT"
-PKG_DEPENDENCIES=""
+PKG_LICENSE="FTL"
+PKG_DEPENDENCIES="zlib:1.3.1 libpng:1.6.40"
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="popt-1.19"
+PKG_BUILD_DIR="freetype-2.13.2"
 
 # Разрешение зависимостей
 resolve_dependencies() {
@@ -42,7 +42,7 @@ unpack_stage() {
 compile_stage() {
     echo "Compiling package..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    ./configure --prefix="$PKG_INSTALL_DIR" || exit 1
+    ./configure --prefix="$PKG_INSTALL_DIR" --with-zlib --with-png || exit 1
     make -j$(nproc) || exit 1
     echo "Compilation completed."
 }

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Основные метаданные пакета
-PKG_NAME="popt"
-PKG_VERSION="1.19"
-PKG_SRC_URL="http://rpm5.org/files/popt/popt-1.19.tar.gz"
+PKG_NAME="flex"
+PKG_VERSION="2.6.4"
+PKG_SRC_URL="https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
 PKG_ARCHITECTURE="amd64"
-PKG_LICENSE="MIT"
+PKG_LICENSE="BSD-2-Clause"
 PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="popt-1.19"
+PKG_BUILD_DIR="flex-2.6.4"
 
 # Разрешение зависимостей
 resolve_dependencies() {
