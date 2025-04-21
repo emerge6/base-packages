@@ -3,13 +3,13 @@
 # Основные метаданные пакета
 PKG_NAME="flex"
 PKG_VERSION="2.6.4"
-PKG_SRC_URL="https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz"
+PKG_SRC_URL="https://github.com/westes/flex/releases/download/v$PKG_VERSION/flex-$PKG_VERSION.tar.gz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="BSD-2-Clause"
-PKG_DEPENDENCIES=""
+PKG_DEPENDENCIES="gcc:14.2.0 make:4.4.1 binutils:2.41"
 PKG_FETCH_METHOD="wget"
-PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="flex-2.6.4"
+PKG_INSTALL_DIR="/usr"
+PKG_BUILD_DIR="flex-$PKG_VERSION"
 
 # Разрешение зависимостей
 resolve_dependencies() {
@@ -27,23 +27,38 @@ resolve_dependencies() {
 
 # Фаза распаковки
 unpack_stage() {
-    echo "Unpacking sources to $PKG_BUILD_DIR..."
+    echo "Unpacking sources to /tmp/$PKG_BUILD_DIR..."
     mkdir -p "/tmp/$PKG_BUILD_DIR"
-    cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    if ! wget -q "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
-        echo "Error downloading sources from $PKG_SRC_URL"
+    cd "/tmp/$PKG_BUILD_DIR" || {
+        echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
+        exit 1
+    }
+    echo "Downloading from $PKG_SRC_URL..."
+    if ! wget -q --no-check-certificate --user-agent="Mozilla/5.0" "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
+        echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
         exit 1
     fi
-    tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
+    echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
+    if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
+        echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
+        exit 1
+    fi
+    rm "$PKG_NAME-$PKG_VERSION.tar.gz"
     echo "Unpacking completed."
 }
 
 # Фаза компиляции
 compile_stage() {
-    echo "Compiling package..."
+    echo "Compiling package in /tmp/$PKG_BUILD_DIR..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    ./configure --prefix="$PKG_INSTALL_DIR" || exit 1
-    make -j$(nproc) || exit 1
+    ./configure --prefix="$PKG_INSTALL_DIR" || {
+        echo "ERROR: Configure failed for $PKG_NAME"
+        exit 1
+    }
+    make -j$(nproc) || {
+        echo "ERROR: Make failed for $PKG_NAME"
+        exit 1
+    }
     echo "Compilation completed."
 }
 
@@ -51,7 +66,10 @@ compile_stage() {
 install_stage() {
     echo "Installing package to $PKG_INSTALL_DIR..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    make install || exit 1
+    make install || {
+        echo "ERROR: Installation failed for $PKG_NAME"
+        exit 1
+    }
     echo "Installation completed."
 }
 
