@@ -3,7 +3,7 @@
 # Основные метаданные пакета
 PKG_NAME="w3m"
 PKG_VERSION="0.5.3"
-PKG_SRC_URL="https://github.com/tats/w3m/archive/refs/tags/v$PKG_VERSION.tar.gz"
+PKG_SRC_URL="https://github.com/tats/w3m/archive/refs/tags/v$PKG_VERSION+git20210102+deb11u1.tar.gz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="MIT"
 PKG_DEPENDENCIES="bash:5.2.15 coreutils:9.5 gzip:1.13"
