@@ -3,7 +3,7 @@
 # Основные метаданные пакета
 PKG_NAME="imagemagick"
 PKG_VERSION="7.1.1-15"
-PKG_SRC_URL="https://imagemagick.org/archive/releases/ImageMagick-7.1.1-15.tar.xz"
+PKG_SRC_URL="https://imagemagick.org/archive/releases/ImageMagick-7-1.1-15.tar.xz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="Apache-2.0"
 PKG_DEPENDENCIES="libpng:1.6.40 libjpeg-turbo:3.0.0 freetype2:2.13.2"
