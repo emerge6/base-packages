@@ -34,7 +34,7 @@ unpack_stage() {
         echo "Error downloading sources from $PKG_SRC_URL"
         exit 1
     fi
-    tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
+    tar -xzf "$PKG_NAME-$PKG_VERSION.tar.xz" --strip-components=1 || exit 1
     echo "Unpacking completed."
 }
 
