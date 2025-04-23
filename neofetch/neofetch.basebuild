@@ -16,8 +16,8 @@ resolve_dependencies() {
     if [ -n "$PKG_DEPENDENCIES" ]; then
         echo "Resolving dependencies for $PKG_NAME..."
         for dep in $PKG_DEPENDENCIES; do
-            local dep_name=$(echo $dep | cut -d: -f1)
-            local dep_version=$(echo $dep | cut -d: -f2)
+            dep_name=$(echo "$dep" | cut -d: -f1)
+            dep_version=$(echo "$dep" | cut -d: -f2)
             echo "Dependency: $dep_name (minimum version $dep_version)"
         done
     else
@@ -37,12 +37,12 @@ unpack_stage() {
         exit 1
     }
     echo "Downloading source from $PKG_SRC_URL..."
-    if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
+    wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz" || {
         echo "ERROR: Failed to download $PKG_NAME from $PKG_SRC_URL"
         exit 1
     }
     echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
-    if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
+    tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || {
         echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
         exit 1
     }
@@ -83,13 +83,13 @@ default() {
 # Эмулятор команд
 emake() {
     case "$1" in
-        "unpack")
+        unpack)
             unpack_stage
             ;;
-        "compile")
+        compile)
             compile_stage
             ;;
-        "install")
+        install)
             install_stage
             ;;
         *)
@@ -107,7 +107,7 @@ handle_error() {
 
 # Главная функция
 main() {
-    trap 'handle_error' ERR
+    trap handle_error ERR
     emake "$1"
 }
 
