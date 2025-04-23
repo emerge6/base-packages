@@ -3,13 +3,13 @@
 # Основные метаданные пакета
 PKG_NAME="neofetch"
 PKG_VERSION="7.1.0"
-PKG_SRC_URL="https://github.com/dylanaraps/neofetch/archive/7.1.0.tar.gz"
-PKG_ARCHITECTURE="amd64"
+PKG_SRC_URL="https://github.com/dylanaraps/neofetch/archive/$PKG_VERSION.tar.gz"
+PKG_ARCHITECTURE="any"
 PKG_LICENSE="MIT"
-PKG_DEPENDENCIES="w3m:0.5.3 imagemagick:6.9.12"
+PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
-PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="neofetch-7.1.0"
+PKG_INSTALL_DIR="/usr"
+PKG_BUILD_DIR="neofetch-$PKG_VERSION"
 
 # Разрешение зависимостей
 resolve_dependencies() {
@@ -27,22 +27,29 @@ resolve_dependencies() {
 
 # Фаза распаковки
 unpack_stage() {
-    echo "Unpacking sources to $PKG_BUILD_DIR..."
+    echo "Unpacking sources to /tmp/$PKG_BUILD_DIR..."
     mkdir -p "/tmp/$PKG_BUILD_DIR"
-    cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    if ! wget -q "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
-        echo "Error downloading sources from $PKG_SRC_URL"
+    cd "/tmp/$PKG_BUILD_DIR" || {
+        echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
         exit 1
-    fi
-    tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
+    }
+    echo "Downloading from $PKG_SRC_URL..."
+    if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
+        echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
+        exit 1
+    }
+    echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
+    if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
+        echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
+        exit 1
+    }
+    rm "$PKG_NAME-$PKG_VERSION.tar.gz"
     echo "Unpacking completed."
 }
 
 # Фаза компиляции
 compile_stage() {
-    echo "Compiling package..."
-    cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    make PREFIX="$PKG_INSTALL_DIR" || exit 1
+    echo "No compilation required for $PKG_NAME."
     echo "Compilation completed."
 }
 
@@ -50,7 +57,10 @@ compile_stage() {
 install_stage() {
     echo "Installing package to $PKG_INSTALL_DIR..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    make PREFIX="$PKG_INSTALL_DIR" install || exit 1
+    install -Dm755 neofetch "$PKG_INSTALL_DIR/bin/neofetch" || {
+        echo "ERROR: Installation failed for $PKG_NAME"
+        exit 1
+    }
     echo "Installation completed."
 }
 
