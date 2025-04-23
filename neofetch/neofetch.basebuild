@@ -14,28 +14,31 @@ PKG_BUILD_DIR="neofetch-$PKG_VERSION"
 # Разрешение зависимостей
 resolve_dependencies() {
     if [ -n "$PKG_DEPENDENCIES" ]; then
-        echo "Resolving dependencies..."
+        echo "Resolving dependencies for $PKG_NAME..."
         for dep in $PKG_DEPENDENCIES; do
             local dep_name=$(echo $dep | cut -d: -f1)
             local dep_version=$(echo $dep | cut -d: -f2)
-            echo "Checking dependency: $dep_name version $dep_version"
+            echo "Dependency: $dep_name (minimum version $dep_version)"
         done
     else
-        echo "No dependencies."
+        echo "No dependencies required for $PKG_NAME."
     fi
 }
 
 # Фаза распаковки
 unpack_stage() {
-    echo "Unpacking sources to /tmp/$PKG_BUILD_DIR..."
-    mkdir -p "/tmp/$PKG_BUILD_DIR"
+    echo "Unpacking $PKG_NAME sources to /tmp/$PKG_BUILD_DIR..."
+    mkdir -p "/tmp/$PKG_BUILD_DIR" || {
+        echo "ERROR: Failed to create directory /tmp/$PKG_BUILD_DIR"
+        exit 1
+    }
     cd "/tmp/$PKG_BUILD_DIR" || {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
         exit 1
     }
-    echo "Downloading from $PKG_SRC_URL..."
+    echo "Downloading source from $PKG_SRC_URL..."
     if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
-        echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
+        echo "ERROR: Failed to download $PKG_NAME from $PKG_SRC_URL"
         exit 1
     }
     echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
@@ -43,30 +46,34 @@ unpack_stage() {
         echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
         exit 1
     }
-    rm "$PKG_NAME-$PKG_VERSION.tar.gz"
-    echo "Unpacking completed."
+    rm -f "$PKG_NAME-$PKG_VERSION.tar.gz" || {
+        echo "WARNING: Failed to remove temporary tarball"
+    }
+    echo "Unpacking completed successfully."
 }
 
 # Фаза компиляции
 compile_stage() {
-    echo "No compilation required for $PKG_NAME."
-    echo "Compilation completed."
+    echo "$PKG_NAME is a shell script; no compilation required."
 }
 
 # Фаза установки
 install_stage() {
-    echo "Installing package to $PKG_INSTALL_DIR..."
-    cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    install -Dm755 neofetch "$PKG_INSTALL_DIR/bin/neofetch" || {
-        echo "ERROR: Installation failed for $PKG_NAME"
+    echo "Installing $PKG_NAME to $PKG_INSTALL_DIR..."
+    cd "/tmp/$PKG_BUILD_DIR" || {
+        echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
         exit 1
     }
-    echo "Installation completed."
+    install -Dm755 neofetch "$PKG_INSTALL_DIR/bin/neofetch" || {
+        echo "ERROR: Failed to install $PKG_NAME to $PKG_INSTALL_DIR/bin"
+        exit 1
+    }
+    echo "Installation completed successfully."
 }
 
 # Общая стадия
 default() {
-    echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
+    echo "Building and installing $PKG_NAME version $PKG_VERSION..."
     resolve_dependencies
     unpack_stage
     compile_stage
@@ -86,7 +93,7 @@ emake() {
             install_stage
             ;;
         *)
-            echo "Unknown command: $1"
+            echo "ERROR: Unknown command: $1"
             exit 1
             ;;
     esac
@@ -94,7 +101,7 @@ emake() {
 
 # Обработка ошибок
 handle_error() {
-    echo "Error: Build or installation process failed."
+    echo "ERROR: Build or installation process for $PKG_NAME failed."
     exit 1
 }
 
