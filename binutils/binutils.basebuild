@@ -6,7 +6,7 @@ PKG_VERSION="2.41"
 PKG_SRC_URL="https://ftp.gnu.org/gnu/binutils/binutils-$PKG_VERSION.tar.gz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL-3.0"
-PKG_DEPENDENCIES=""
+PKG_DEPENDENCIES="gcc:14.2.0 make:4.4.1 zlib:1.3.1"
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr"
 PKG_BUILD_DIR="binutils-$PKG_VERSION"
@@ -37,12 +37,12 @@ unpack_stage() {
     if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
         echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
         exit 1
-    }
+    fi
     echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
     if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
         echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
         exit 1
-    }
+    fi
     rm "$PKG_NAME-$PKG_VERSION.tar.gz"
     echo "Unpacking completed."
 }
@@ -51,8 +51,14 @@ unpack_stage() {
 compile_stage() {
     echo "Compiling package in /tmp/$PKG_BUILD_DIR..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    ./configure --prefix="$PKG_INSTALL_DIR" \
-                --disable-dependency-tracking || {
+    mkdir -p build
+    cd build || exit 1
+    ../configure --prefix="$PKG_INSTALL_DIR" \
+                 --disable-multilib \
+                 --enable-gold \
+                 --enable-ld=default \
+                 --enable-plugins \
+                 --with-system-zlib || {
         echo "ERROR: Configure failed for $PKG_NAME"
         exit 1
     }
@@ -66,7 +72,7 @@ compile_stage() {
 # Фаза установки
 install_stage() {
     echo "Installing package to $PKG_INSTALL_DIR..."
-    cd "/tmp/$PKG_BUILD_DIR" || exit 1
+    cd "/tmp/$PKG_BUILD_DIR/build" || exit 1
     make install || {
         echo "ERROR: Installation failed for $PKG_NAME"
         exit 1
