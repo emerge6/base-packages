@@ -6,7 +6,7 @@ PKG_VERSION="14.2.0"
 PKG_SRC_URL="https://ftp.gnu.org/gnu/gcc/gcc-$PKG_VERSION/gcc-$PKG_VERSION.tar.gz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL-3.0"
-PKG_DEPENDENCIES="gmp:6.3.0 mpfr:4.2.1 mpc:1.3.1 make:4.4.1 binutils:2.41"
+PKG_DEPENDENCIES="binutils:2.41"
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr"
 PKG_BUILD_DIR="gcc-$PKG_VERSION"
@@ -37,12 +37,12 @@ unpack_stage() {
     if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
         echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
         exit 1
-    fi
+    }
     echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
     if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
         echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
         exit 1
-    fi
+    }
     rm "$PKG_NAME-$PKG_VERSION.tar.gz"
     echo "Unpacking completed."
 }
@@ -51,14 +51,14 @@ unpack_stage() {
 compile_stage() {
     echo "Compiling package in /tmp/$PKG_BUILD_DIR..."
     cd "/tmp/$PKG_BUILD_DIR" || exit 1
-    # Создание отдельной директории для сборки
+    # Create build directory to avoid source pollution
     mkdir -p build
-    cd build || exit 1
+    cd build
     ../configure --prefix="$PKG_INSTALL_DIR" \
-                 --disable-multilib \
                  --enable-languages=c,c++ \
-                 --with-system-zlib \
-                 --disable-bootstrap || {
+                 --disable-multilib \
+                 --disable-bootstrap \
+                 --disable-dependency-tracking || {
         echo "ERROR: Configure failed for $PKG_NAME"
         exit 1
     }
