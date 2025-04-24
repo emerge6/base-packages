@@ -124,3 +124,4 @@ xz-utils
 yasm
 zlib
 zsh
+fastfetch
