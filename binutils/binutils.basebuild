@@ -11,7 +11,7 @@ PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr"
 PKG_BUILD_DIR="binutils-$PKG_VERSION"
 
-# Проверка версии утилиты
+# Проверкaа версии утилиты
 check_version() {
     local cmd=$1
     local min_version=$2
@@ -120,7 +120,7 @@ compile_stage() {
                  --enable-ld=default \
                  --enable-plugins \
                  --with-system-zlib || {
-        echo "ERROR: Configure failed for $PKG_NAME"
+        echo "ERROR: Configure failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/config.log for details."
         return 1
     }
     make -j$(nproc) 2>&1 | tee make.log || {
