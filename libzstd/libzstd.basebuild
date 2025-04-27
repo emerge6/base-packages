@@ -128,7 +128,7 @@ install_stage() {
         echo "Found pkg-config files in $PKG_INSTALL_DIR/lib/pkgconfig"
     else
         echo "WARNING: pkg-config files not found in $PKG_INSTALL_DIR/lib/pkgconfig"
-    fi
+    }
     echo "Installation completed."
     return 0
 }

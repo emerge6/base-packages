@@ -123,8 +123,8 @@ compile_stage() {
         echo "ERROR: Configure failed for $PKG_NAME"
         return 1
     }
-    make -j$(nproc) || {
-        echo "ERROR: Make failed for $PKG_NAME"
+    make -j$(nproc) 2>&1 | tee make.log || {
+        echo "ERROR: Make failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/make.log for details."
         return 1
     }
     echo "Compilation completed."
@@ -138,8 +138,8 @@ install_stage() {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR/build"
         return 1
     }
-    make install || {
-        echo "ERROR: Installation failed for $PKG_NAME"
+    make install 2>&1 | tee install.log || {
+        echo "ERROR: Installation failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/install.log for details."
         return 1
     }
     echo "Installation completed."
