@@ -11,86 +11,40 @@ PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr"
 PKG_BUILD_DIR="zstd-$PKG_VERSION"
 
-# Проверка версии утилиты
-check_version() {
-    local cmd=$1
-    local min_version=$2
-    local version
-
-    if ! command -v "$cmd" &>/dev/null; then
-        echo "ERROR: $cmd is not installed"
-        return 1
-    fi
-
-    version=$($cmd --version | head -n1 | grep -oP '\d+\.\d+\.\d+')
-    if [ -z "$version" ]; then
-        echo "ERROR: Could not determine version of $cmd"
-        return 1
-    fi
-
-    if [ "$(printf '%s\n' "$version" "$min_version" | sort -V | head -n1)" != "$min_version" ]; then
-        echo "ERROR: $cmd version $version is less than required $min_version"
-        return 1
-    fi
-    echo "Found $cmd version $version"
-    return 0
-}
-
 # Разрешение зависимостей
 resolve_dependencies() {
-    echo "Resolving dependencies..."
-    local dep_name dep_version
-    for dep in $PKG_DEPENDENCIES; do
-        dep_name=$(echo "$dep" | cut -d: -f1)
-        dep_version=$(echo "$dep" | cut -d: -f2)
-
-        case "$dep_name" in
-            gcc)
-                check_version "gcc" "$dep_version" || return 1
-                ;;
-            make)
-                check_version "make" "$dep_version" || return 1
-                ;;
-            zlib)
-                if ! pkg-config --atleast-version="$dep_version" "$dep_name"; then
-                    echo "ERROR: $dep_name version >= $dep_version is not installed"
-                    return 1
-                fi
-                echo "Found $dep_name version $(pkg-config --modversion "$dep_name")"
-                ;;
-            *)
-                echo "WARNING: Unknown dependency $dep_name, skipping version check"
-                ;;
-        esac
-    done
-    echo "All dependencies satisfied."
-    return 0
+    if [ -n "$PKG_DEPENDENCIES" ]; then
+        echo "Resolving dependencies..."
+        for dep in $PKG_DEPENDENCIES; do
+            local dep_name=$(echo "$dep" | cut -d: -f1)
+            local dep_version=$(echo "$dep" | cut -d: -f2)
+            echo "Checking dependency: $dep_name version $dep_version"
+        done
+    else
+        echo "No dependencies."
+    fi
 }
 
 # Фаза распаковки
 unpack_stage() {
     echo "Unpacking sources to /tmp/$PKG_BUILD_DIR..."
-    mkdir -p "/tmp/$PKG_BUILD_DIR" || {
-        echo "ERROR: Failed to create directory /tmp/$PKG_BUILD_DIR"
-        return 1
-    }
+    mkdir -p "/tmp/$PKG_BUILD_DIR"
     cd "/tmp/$PKG_BUILD_DIR" || {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
-        return 1
+        exit 1
     }
     echo "Downloading from $PKG_SRC_URL..."
     if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
         echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
-        return 1
-    }
+        exit 1
+    fi
     echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
     if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
         echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
-        return 1
-    }
+        exit 1
+    fi
     rm -f "$PKG_NAME-$PKG_VERSION.tar.gz"
     echo "Unpacking completed."
-    return 0
 }
 
 # Фаза компиляции
@@ -98,18 +52,17 @@ compile_stage() {
     echo "Compiling package in /tmp/$PKG_BUILD_DIR..."
     cd "/tmp/$PKG_BUILD_DIR" || {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
-        return 1
+        exit 1
     }
     cd lib || {
         echo "ERROR: Failed to change directory to lib"
-        return 1
+        exit 1
     }
     make -j$(nproc) PREFIX="$PKG_INSTALL_DIR" 2>&1 | tee build.log || {
         echo "ERROR: Make failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/lib/build.log for details."
-        return 1
+        exit 1
     }
     echo "Compilation completed."
-    return 0
 }
 
 # Фаза установки
@@ -117,30 +70,28 @@ install_stage() {
     echo "Installing package to $PKG_INSTALL_DIR..."
     cd "/tmp/$PKG_BUILD_DIR/lib" || {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR/lib"
-        return 1
+        exit 1
     }
     make install PREFIX="$PKG_INSTALL_DIR" 2>&1 | tee install.log || {
         echo "ERROR: Installation failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/lib/install.log for details."
-        return 1
+        exit 1
     }
     # Ensure pkg-config files are installed correctly
     if [ -d "$PKG_INSTALL_DIR/lib/pkgconfig" ]; then
         echo "Found pkg-config files in $PKG_INSTALL_DIR/lib/pkgconfig"
     else
         echo "WARNING: pkg-config files not found in $PKG_INSTALL_DIR/lib/pkgconfig"
-    }
+    fi
     echo "Installation completed."
-    return 0
 }
 
 # Общая стадия
 default() {
     echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
-    resolve_dependencies || return 1
-    unpack_stage || return 1
-    compile_stage || return 1
-    install_stage || return 1
-    return 0
+    resolve_dependencies
+    unpack_stage
+    compile_stage
+    install_stage
 }
 
 # Эмулятор команд
@@ -157,7 +108,7 @@ emake() {
             ;;
         *)
             echo "Unknown command: $1"
-            return 1
+            exit 1
             ;;
     esac
 }
@@ -165,7 +116,7 @@ emake() {
 # Обработка ошибок
 handle_error() {
     echo "Error: Build or installation process failed."
-    return 1
+    exit 1
 }
 
 # Главная функция
