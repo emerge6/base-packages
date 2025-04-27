@@ -100,8 +100,6 @@ compile_stage() {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
         return 1
     }
-    # libzstd uses the 'build/meson' or 'Makefile' in the root directory
-    # We'll use the Makefile in the 'lib' directory for a standard library build
     cd lib || {
         echo "ERROR: Failed to change directory to lib"
         return 1
@@ -121,8 +119,8 @@ install_stage() {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR/lib"
         return 1
     }
-    make install PREFIX="$PKG_INSTALL_DIR" || {
-        echo "ERROR: Installation failed for $PKG_NAME"
+    make install PREFIX="$PKG_INSTALL_DIR" 2>&1 | tee install.log || {
+        echo "ERROR: Installation failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/lib/install.log for details."
         return 1
     }
     # Ensure pkg-config files are installed correctly
