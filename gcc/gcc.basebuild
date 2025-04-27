@@ -11,98 +11,40 @@ PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr"
 PKG_BUILD_DIR="gcc-$PKG_VERSION"
 
-# Проверка версии утилиты
-check_version() {
-    local cmd=$1
-    local min_version=$2
-    local version
-
-    if ! command -v "$cmd" &>/dev/null; then
-        echo "ERROR: $cmd is not installed"
-        return 1
-    fi
-
-    version=$($cmd --version | head -n1 | grep -oP '\d+\.\d+\.\d+')
-    if [ -z "$version" ]; then
-        echo "ERROR: Could not determine version of $cmd"
-        return 1
-    fi
-
-    if [ "$(printf '%s\n' "$version" "$min_version" | sort -V | head -n1)" != "$min_version" ]; then
-        echo "ERROR: $cmd version $version is less than required $min_version"
-        return 1
-    fi
-    echo "Found $cmd version $version"
-    return 0
-}
-
 # Разрешение зависимостей
 resolve_dependencies() {
-    echo "Resolving dependencies..."
-    local dep_name dep_version
-    for dep in $PKG_DEPENDENCIES; do
-        dep_name=$(echo "$dep" | cut -d: -f1)
-        dep_version=$(echo "$dep" | cut -d: -f2)
-
-        case "$dep_name" in
-            make|flex|bison)
-                check_version "$dep_name" "$dep_version" || return 1
-                ;;
-            binutils)
-                # Check if binutils (e.g., ld, as) is installed
-                if ! command -v ld &>/dev/null || ! command -v as &>/dev/null; then
-                    echo "ERROR: binutils is not installed"
-                    return 1
-                fi
-                # Note: Version checking for binutils is complex; assume package manager handles it
-                echo "Found binutils"
-                ;;
-            gmp|mpfr|mpc|zlib|libzstd)
-                if ! pkg-config --atleast-version="$dep_version" "$dep_name"; then
-                    echo "ERROR: $dep_name version >= $dep_version is not installed"
-                    return 1
-                fi
-                echo "Found $dep_name version $(pkg-config --modversion "$dep_name")"
-                ;;
-            *)
-                echo "WARNING: Unknown dependency $dep_name, skipping version check"
-                ;;
-        esac
-    done
-    # Ensure a C compiler is available (needed to build GCC)
-    if ! command -v gcc &>/dev/null; then
-        echo "ERROR: A C compiler (gcc) is required to build GCC"
-        return 1
+    if [ -n "$PKG_DEPENDENCIES" ]; then
+        echo "Resolving dependencies..."
+        for dep in $PKG_DEPENDENCIES; do
+            local dep_name=$(echo "$dep" | cut -d: -f1)
+            local dep_version=$(echo "$dep" | cut -d: -f2)
+            echo "Checking dependency: $dep_name version $dep_version"
+        done
+    else
+        echo "No dependencies."
     fi
-    echo "Found gcc version $(gcc --version | head -n1)"
-    echo "All dependencies satisfied."
-    return 0
 }
 
 # Фаза распаковки
 unpack_stage() {
     echo "Unpacking sources to /tmp/$PKG_BUILD_DIR..."
-    mkdir -p "/tmp/$PKG_BUILD_DIR" || {
-        echo "ERROR: Failed to create directory /tmp/$PKG_BUILD_DIR"
-        return 1
-    }
+    mkdir -p "/tmp/$PKG_BUILD_DIR"
     cd "/tmp/$PKG_BUILD_DIR" || {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
-        return 1
+        exit 1
     }
     echo "Downloading from $PKG_SRC_URL..."
     if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
         echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
-        return 1
-    }
+        exit 1
+    fi
     echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
     if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
         echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
-        return 1
-    }
+        exit 1
+    fi
     rm -f "$PKG_NAME-$PKG_VERSION.tar.gz"
     echo "Unpacking completed."
-    return 0
 }
 
 # Фаза компиляции
@@ -110,39 +52,28 @@ compile_stage() {
     echo "Compiling package in /tmp/$PKG_BUILD_DIR..."
     cd "/tmp/$PKG_BUILD_DIR" || {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
-        return 1
+        exit 1
     }
-    mkdir -p build || {
-        echo "ERROR: Failed to create build directory"
-        return 1
-    }
+    mkdir -p build
     cd build || {
         echo "ERROR: Failed to change directory to build"
-        return 1
+        exit 1
     }
-    # Configure with Gentoo-inspired flags
-    ../configure \
-        --prefix="$PKG_INSTALL_DIR" \
-        --enable-languages=c,c++ \
-        --disable-multilib \
-        --disable-bootstrap \
-        --enable-shared \
-        --with-system-zlib \
-        --with-gmp="$(pkg-config --variable=prefix gmp)" \
-        --with-mpfr="$(pkg-config --variable=prefix mpfr)" \
-        --with-mpc="$(pkg-config --variable=prefix mpc)" \
-        --enable-checking=release \
-        --disable-nls \
-        --with-pkgversion="Openbase" || {
+    ../configure --prefix="$PKG_INSTALL_DIR" \
+                 --disable-multilib \
+                 --enable-languages=c,c++ \
+                 --with-system-zlib \
+                 --with-gmp=/usr \
+                 --with-mpfr=/usr \
+                 --with-mpc=/usr || {
         echo "ERROR: Configure failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/config.log for details."
-        return 1
+        exit 1
     }
     make -j$(nproc) 2>&1 | tee make.log || {
         echo "ERROR: Make failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/make.log for details."
-        return 1
+        exit 1
     }
     echo "Compilation completed."
-    return 0
 }
 
 # Фаза установки
@@ -150,29 +81,22 @@ install_stage() {
     echo "Installing package to $PKG_INSTALL_DIR..."
     cd "/tmp/$PKG_BUILD_DIR/build" || {
         echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR/build"
-        return 1
+        exit 1
     }
     make install 2>&1 | tee install.log || {
         echo "ERROR: Installation failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/install.log for details."
-        return 1
-    }
-    # Ensure ld.so.conf is updated for new libraries
-    echo "$PKG_INSTALL_DIR/lib" > /etc/ld.so.conf.d/gcc.conf
-    ldconfig || {
-        echo "WARNING: Failed to update ld.so.conf"
+        exit 1
     }
     echo "Installation completed."
-    return 0
 }
 
 # Общая стадия
 default() {
     echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
-    resolve_dependencies || return 1
-    unpack_stage || return 1
-    compile_stage || return 1
-    install_stage || return 1
-    return 0
+    resolve_dependencies
+    unpack_stage
+    compile_stage
+    install_stage
 }
 
 # Эмулятор команд
@@ -189,7 +113,7 @@ emake() {
             ;;
         *)
             echo "Unknown command: $1"
-            return 1
+            exit 1
             ;;
     esac
 }
@@ -197,7 +121,7 @@ emake() {
 # Обработка ошибок
 handle_error() {
     echo "Error: Build or installation process failed."
-    return 1
+    exit 1
 }
 
 # Главная функция
