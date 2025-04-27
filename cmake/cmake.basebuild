@@ -3,7 +3,7 @@
 # Основные метаданные пакета
 PKG_NAME="cmake"
 PKG_VERSION="3.12.4"
-PKG_SRC_URL="https://github.com/Kitware/CMake/releases/download/v$PKG_VERSION/cmake-$PKG_VERSION.tar.gz"
+PKG_SRC_URL="https://cmake.org/files/v${PKG_VERSION%.*}/cmake-$PKG_VERSION.tar.gz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="BSD-3-Clause"
 PKG_DEPENDENCIES="gcc:14.2.0 make:4.4.1 ncurses:6.4"
@@ -34,16 +34,27 @@ unpack_stage() {
         exit 1
     }
     echo "Downloading from $PKG_SRC_URL..."
-    if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
-        echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
-        exit 1
-    fi
+    local attempts=3
+    local count=0
+    while [ $count -lt $attempts ]; do
+        if wget -q --no-check-certificate --timeout=10 "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz" 2> wget_error.log; then
+            break
+        else
+            count=$((count + 1))
+            echo "Download attempt $count failed: $(cat wget_error.log)"
+            if [ $count -eq $attempts ]; then
+                echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL after $attempts attempts"
+                exit 1
+            fi
+            sleep 5
+        fi
+    done
     echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
     if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
         echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
         exit 1
     fi
-    rm -f "$PKG_NAME-$PKG_VERSION.tar.gz"
+    rm -f "$PKG_NAME-$PKG_VERSION.tar.gz" wget_error.log
     echo "Unpacking completed."
 }
 
