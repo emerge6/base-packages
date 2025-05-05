@@ -40,13 +40,12 @@ unpack_stage() {
     exit 1
   fi
 
-  echo "Extracting archive..."
-  if ! tar -xjf "${PKG_NAME}-${PKG_VERSION}.tar.bz2"; then
+  echo "Extracting archive into build directory..."
+  if ! tar -xjf "${PKG_NAME}-${PKG_VERSION}.tar.bz2" -C "$PKG_BUILD_DIR" --strip-components=1; then
     echo "Error extracting archive"
     exit 1
   fi
 
-  mv "unix-tree-${PKG_VERSION}" "$PKG_BUILD_DIR" || exit 1
   echo "Unpacking completed."
 }
 
