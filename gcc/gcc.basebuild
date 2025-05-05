@@ -1,134 +1,134 @@
 #!/bin/bash
 
-# Основные метаданные пакета
+# --- Основные метаданные пакета ---
 PKG_NAME="gcc"
-PKG_VERSION="14.2.0"
-PKG_SRC_URL="https://ftp.gnu.org/gnu/gcc/gcc-$PKG_VERSION/gcc-$PKG_VERSION.tar.gz"
+PKG_VERSION="12.2.0"
+PKG_SRC_URL="https://ftp.gnu.org/gnu/gcc/gcc-${PKG_VERSION}/gcc-${PKG_VERSION}.tar.xz"
 PKG_ARCHITECTURE="amd64"
-PKG_LICENSE="GPL-3.0"
-PKG_DEPENDENCIES="gmp:6.2.1 mpfr:4.2.1 mpc:1.3.1 zlib:1.3.1 libzstd:1.5.6 binutils:2.41 make:4.4.1 flex:2.6.4 bison:3.8.2"
+PKG_LICENSE="GPLv3+"
+# Для GCC обязательны библиотеки GMP, MPFR, MPC, ISL
+PKG_DEPENDENCIES="gmp:6.2.1 mpfr:4.1.0 mpc:1.2.1 isl:0.24"
 PKG_FETCH_METHOD="wget"
-PKG_INSTALL_DIR="/usr"
-PKG_BUILD_DIR="gcc-$PKG_VERSION"
+PKG_INSTALL_DIR="/usr/local/gcc-${PKG_VERSION}"
+PKG_BUILD_DIR="/tmp/${PKG_NAME}-${PKG_VERSION}-build"
+PKG_SRC_DIR="/tmp/${PKG_NAME}-${PKG_VERSION}"
 
-# Разрешение зависимостей
+# --- Разрешение зависимостей ---
 resolve_dependencies() {
-    if [ -n "$PKG_DEPENDENCIES" ]; then
-        echo "Resolving dependencies..."
-        for dep in $PKG_DEPENDENCIES; do
-            local dep_name=$(echo "$dep" | cut -d: -f1)
-            local dep_version=$(echo "$dep" | cut -d: -f2)
-            echo "Checking dependency: $dep_name version $dep_version"
-        done
-    else
-        echo "No dependencies."
-    fi
+  if [ -n "$PKG_DEPENDENCIES" ]; then
+    echo "Resolving dependencies..."
+    for dep in $PKG_DEPENDENCIES; do
+      local name=${dep%%:*}
+      local ver=${dep#*:}
+      echo "  - Проверка: $name (>= $ver)"
+      # Здесь вы можете интегрировать реальный вызов пакетного менеджера,
+      # например: base pm check $name $ver
+    done
+  else
+    echo "No dependencies."
+  fi
 }
 
-# Фаза распаковки
+# --- Фаза распаковки ---
 unpack_stage() {
-    echo "Unpacking sources to /tmp/$PKG_BUILD_DIR..."
-    mkdir -p "/tmp/$PKG_BUILD_DIR"
-    cd "/tmp/$PKG_BUILD_DIR" || {
-        echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
-        exit 1
-    }
-    echo "Downloading from $PKG_SRC_URL..."
-    if ! wget -q --no-check-certificate "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
-        echo "ERROR downloading sources for $PKG_NAME: Failed to download from $PKG_SRC_URL"
-        exit 1
-    fi
-    echo "Extracting $PKG_NAME-$PKG_VERSION.tar.gz..."
-    if ! tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1; then
-        echo "ERROR: Failed to extract $PKG_NAME-$PKG_VERSION.tar.gz"
-        exit 1
-    fi
-    rm -f "$PKG_NAME-$PKG_VERSION.tar.gz"
-    echo "Unpacking completed."
-}
+  echo "Unpacking sources to ${PKG_SRC_DIR}..."
+  rm -rf "${PKG_SRC_DIR}" "${PKG_BUILD_DIR}"
+  mkdir -p "${PKG_SRC_DIR}" "${PKG_BUILD_DIR}"
+  cd /tmp || exit 1
 
-# Фаза компиляции
-compile_stage() {
-    echo "Compiling package in /tmp/$PKG_BUILD_DIR..."
-    cd "/tmp/$PKG_BUILD_DIR" || {
-        echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR"
-        exit 1
-    }
-    mkdir -p build
-    cd build || {
-        echo "ERROR: Failed to change directory to build"
-        exit 1
-    }
-    ../configure --prefix="$PKG_INSTALL_DIR" \
-                 --disable-multilib \
-                 --enable-languages=c,c++ \
-                 --with-system-zlib \
-                 --with-gmp=/usr \
-                 --with-mpfr=/usr \
-                 --with-mpc=/usr || {
-        echo "ERROR: Configure failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/config.log for details."
-        exit 1
-    }
-    make -j$(nproc) 2>&1 | tee make.log || {
-        echo "ERROR: Make failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/make.log for details."
-        exit 1
-    }
-    echo "Compilation completed."
-}
-
-# Фаза установки
-install_stage() {
-    echo "Installing package to $PKG_INSTALL_DIR..."
-    cd "/tmp/$PKG_BUILD_DIR/build" || {
-        echo "ERROR: Failed to change directory to /tmp/$PKG_BUILD_DIR/build"
-        exit 1
-    }
-    make install 2>&1 | tee install.log || {
-        echo "ERROR: Installation failed for $PKG_NAME. Check /tmp/$PKG_BUILD_DIR/build/install.log for details."
-        exit 1
-    }
-    echo "Installation completed."
-}
-
-# Общая стадия
-default() {
-    echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
-    resolve_dependencies
-    unpack_stage
-    compile_stage
-    install_stage
-}
-
-# Эмулятор команд
-emake() {
-    case "$1" in
-        "unpack")
-            unpack_stage
-            ;;
-        "compile")
-            compile_stage
-            ;;
-        "install")
-            install_stage
-            ;;
-        *)
-            echo "Unknown command: $1"
-            exit 1
-            ;;
-    esac
-}
-
-# Обработка ошибок
-handle_error() {
-    echo "Error: Build or installation process failed."
+  echo "Downloading source archive..."
+  if ! $PKG_FETCH_METHOD -q "$PKG_SRC_URL" -O "gcc-${PKG_VERSION}.tar.xz"; then
+    echo "Error: cannot download $PKG_SRC_URL"
     exit 1
+  fi
+
+  echo "Extracting archive..."
+  if ! tar -xf "gcc-${PKG_VERSION}.tar.xz" -C "$(dirname "$PKG_SRC_DIR")"; then
+    echo "Error: extraction failed"
+    exit 1
+  fi
+
+  echo "Unpacking completed."
 }
 
-# Главная функция
+# --- Фаза компиляции ---
+compile_stage() {
+  echo "Configuring and compiling GCC..."
+  cd "$PKG_BUILD_DIR" || exit 1
+
+  # Настраиваем сборку: включаем языки, указываем зависимости
+  if ! "${PKG_SRC_DIR}"/configure \
+      --prefix="$PKG_INSTALL_DIR" \
+      --enable-languages=c,c++ \
+      --disable-multilib \
+      --with-gmp="/usr" \
+      --with-mpfr="/usr" \
+      --with-mpc="/usr" \
+      --with-isl="/usr" \
+      --enable-shared \
+      --enable-threads=posix; then
+    echo "Error: configure failed"
+    exit 1
+  fi
+
+  # Компиляция
+  if ! make -j"$(nproc)"; then
+    echo "Error: make failed"
+    exit 1
+  fi
+
+  echo "Compilation completed."
+}
+
+# --- Фаза установки ---
+install_stage() {
+  echo "Installing GCC to ${PKG_INSTALL_DIR}..."
+  cd "$PKG_BUILD_DIR" || exit 1
+
+  if ! make install; then
+    echo "Error: make install failed"
+    exit 1
+  fi
+
+  echo "Installation completed."
+}
+
+# --- Основной процесс сборки ---
+default() {
+  echo "=== Building and installing $PKG_NAME-$PKG_VERSION ==="
+  resolve_dependencies
+  unpack_stage
+  compile_stage
+  install_stage
+  echo "=== $PKG_NAME-$PKG_VERSION successfully installed to $PKG_INSTALL_DIR ==="
+}
+
+# --- Эмулятор команд (unpack|compile|install) ---
+emake() {
+  case "$1" in
+    unpack)   unpack_stage ;;
+    compile)  compile_stage ;;
+    install)  install_stage ;;
+    *) echo "Unknown command: $1"; exit 1 ;;
+  esac
+}
+
+# --- Обработка ошибок ---
+handle_error() {
+  echo "Error: build or install process failed."
+  exit 1
+}
+
+# --- Точка входа ---
 main() {
-    trap 'handle_error' ERR
+  trap 'handle_error' ERR
+  if [ -z "$1" ]; then
+    default
+  else
     emake "$1"
+  fi
 }
 
-# Запуск
+# --- Запуск ---
 main "$@"
+
