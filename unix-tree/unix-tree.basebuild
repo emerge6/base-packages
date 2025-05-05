@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Основные метаданные пакета
-PKG_NAME="tree"
+PKG_NAME="unix-tree"
 PKG_VERSION="2.2.1"
 PKG_SRC_URL="https://gitlab.com/OldManProgrammer/unix-tree/-/archive/${PKG_VERSION}/unix-tree-${PKG_VERSION}.tar.bz2"
 PKG_ARCHITECTURE="amd64"
@@ -16,10 +16,9 @@ resolve_dependencies() {
   if [ -n "$PKG_DEPENDENCIES" ]; then
     echo "Resolving dependencies..."
     for dep in $PKG_DEPENDENCIES; do
-      local dep_name=$(echo "$dep" | cut -d: -f1)
-      local dep_version=$(echo "$dep" | cut -d: -f2)
+      local dep_name=$(echo $dep | cut -d: -f1)
+      local dep_version=$(echo $dep | cut -d: -f2)
       echo "Checking dependency: $dep_name version $dep_version"
-      # Здесь можно добавить логику установки зависимостей
     done
   else
     echo "No dependencies."
@@ -29,7 +28,7 @@ resolve_dependencies() {
 # Фаза распаковки
 unpack_stage() {
   echo "Unpacking sources to $PKG_BUILD_DIR..."
-  mkdir -p "$PKG_BUILD_DIR" || exit 1
+  mkdir -p "$PKG_BUILD_DIR"
   cd /tmp || exit 1
   if ! wget -q "$PKG_SRC_URL" -O "${PKG_NAME}-${PKG_VERSION}.tar.bz2"; then
     echo "Error downloading sources from $PKG_SRC_URL"
@@ -44,7 +43,7 @@ unpack_stage() {
 compile_stage() {
   echo "Compiling package..."
   cd "$PKG_BUILD_DIR" || exit 1
-  make -j"$(nproc)" || exit 1
+  make || exit 1
   echo "Compilation completed."
 }
 
@@ -93,11 +92,7 @@ handle_error() {
 # Главная функция
 main() {
   trap 'handle_error' ERR
-  if [ -z "$1" ]; then
-    default
-  else
-    emake "$1"
-  fi
+  emake "$1"
 }
 
 # Запуск
