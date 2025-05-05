@@ -1,0 +1,126 @@
+#!/bin/bash
+
+# --- Основные метаданные пакета ---
+PKG_NAME="isl"
+PKG_VERSION="0.24.1"
+PKG_SRC_URL="https://repo.or.cz/isl.git/snapshot/isl-${PKG_VERSION}.tar.gz"
+PKG_ARCHITECTURE="amd64"
+PKG_LICENSE="MIT"
+# GMP требуется для сборки ISL
+PKG_DEPENDENCIES="gmp:6.2.1"
+PKG_FETCH_METHOD="wget"
+PKG_INSTALL_DIR="/usr/local/isl-${PKG_VERSION}"
+PKG_BUILD_DIR="/tmp/${PKG_NAME}-${PKG_VERSION}-build"
+PKG_SRC_DIR="/tmp/${PKG_NAME}-${PKG_VERSION}"
+
+# --- Разрешение зависимостей ---
+resolve_dependencies() {
+  if [ -n "$PKG_DEPENDENCIES" ]; then
+    echo "Resolving dependencies..."
+    for dep in $PKG_DEPENDENCIES; do
+      local name=${dep%%:*}
+      local ver=${dep#*:}
+      echo "  - Проверка: $name (>= $ver)"
+      # Здесь можно вызывать реальный пакетный менеджер: base pm check $name $ver
+    done
+  else
+    echo "No dependencies."
+  fi
+}
+
+# --- Фаза распаковки ---
+unpack_stage() {
+  echo "Unpacking sources to ${PKG_SRC_DIR}..."
+  rm -rf "${PKG_SRC_DIR}" "${PKG_BUILD_DIR}"
+  mkdir -p "${PKG_SRC_DIR}" "${PKG_BUILD_DIR}"
+  cd /tmp || exit 1
+
+  echo "Downloading source archive..."
+  if ! $PKG_FETCH_METHOD -q "$PKG_SRC_URL" -O "isl-${PKG_VERSION}.tar.gz"; then
+    echo "Error: cannot download $PKG_SRC_URL"
+    exit 1
+  fi
+
+  echo "Extracting archive..."
+  if ! tar -xzf "isl-${PKG_VERSION}.tar.gz" -C "$(dirname "$PKG_SRC_DIR")"; then
+    echo "Error: extraction failed"
+    exit 1
+  fi
+
+  echo "Unpacking completed."
+}
+
+# --- Фаза компиляции ---
+compile_stage() {
+  echo "Configuring and compiling ISL..."
+  cd "$PKG_BUILD_DIR" || exit 1
+
+  # Запускаем configure из исходников, указывая путь к GMP
+  if ! "${PKG_SRC_DIR}"/configure \
+      --prefix="$PKG_INSTALL_DIR" \
+      --with-gmp-prefix="/usr"; then
+    echo "Error: configure failed"
+    exit 1
+  fi
+
+  # Компиляция
+  if ! make -j"$(nproc)"; then
+    echo "Error: make failed"
+    exit 1
+  fi
+
+  echo "Compilation completed."
+}
+
+# --- Фаза установки ---
+install_stage() {
+  echo "Installing ISL to ${PKG_INSTALL_DIR}..."
+  cd "$PKG_BUILD_DIR" || exit 1
+
+  if ! make install; then
+    echo "Error: make install failed"
+    exit 1
+  fi
+
+  echo "Installation completed."
+}
+
+# --- Основной процесс сборки ---
+default() {
+  echo "=== Building and installing $PKG_NAME-$PKG_VERSION ==="
+  resolve_dependencies
+  unpack_stage
+  compile_stage
+  install_stage
+  echo "=== $PKG_NAME-$PKG_VERSION successfully installed to $PKG_INSTALL_DIR ==="
+}
+
+# --- Эмулятор команд (unpack|compile|install) ---
+emake() {
+  case "$1" in
+    unpack)   unpack_stage ;;
+    compile)  compile_stage ;;
+    install)  install_stage ;;
+    *) echo "Unknown command: $1"; exit 1 ;;
+  esac
+}
+
+# --- Обработка ошибок ---
+handle_error() {
+  echo "Error: build or install process failed."
+  exit 1
+}
+
+# --- Точка входа ---
+main() {
+  trap 'handle_error' ERR
+  if [ -z "$1" ]; then
+    default
+  else
+    emake "$1"
+  fi
+}
+
+# --- Запуск ---
+main "$@"
+
