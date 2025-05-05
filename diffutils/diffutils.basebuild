@@ -2,15 +2,16 @@
 
 # Основные метаданные пакета
 
-PKG_NAME="libtool"
-PKG_VERSION="2.4.7"
-PKG_SRC_URL="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
+PKG_NAME="diffutils"
+PKG_VERSION="3.8"
+PKG_SRC_URL="https://ftp.gnu.org/gnu/diffutils/diffutils-3.8.tar.xz"
+PKG_TARBALL_FILE=$(basename "$PKG_SRC_URL")
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL"
 PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="libtool-2.4.7"
+PKG_BUILD_DIR="$PKG_NAME-$PKG_VERSION"
 
 # Разрешение зависимостей
 
@@ -33,11 +34,11 @@ unpack_stage() {
   echo "Unpacking sources to $PKG_BUILD_DIR..."
   mkdir -p "/tmp/$PKG_BUILD_DIR"
   cd "/tmp/$PKG_BUILD_DIR" || exit 1
-  if ! wget -q "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.xz"; then
+  if ! wget -q "$PKG_SRC_URL" -O "$PKG_TARBALL_FILE"; then
     echo "Error downloading sources from $PKG_SRC_URL"
     exit 1
   fi
-  tar -xJf "$PKG_NAME-$PKG_VERSION.tar.xz" --strip-components=1 || exit 1
+  tar -xf "$PKG_TARBALL_FILE" --strip-components=1 || exit 1
   echo "Unpacking completed."
 }
 

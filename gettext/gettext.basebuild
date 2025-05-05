@@ -2,15 +2,15 @@
 
 # Основные метаданные пакета
 
-PKG_NAME="libtool"
-PKG_VERSION="2.4.7"
-PKG_SRC_URL="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
+PKG_NAME="gettext"
+PKG_VERSION="0.21"
+PKG_SRC_URL="https://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.xz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL"
 PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="libtool-2.4.7"
+PKG_BUILD_DIR="gettext-0.21"
 
 # Разрешение зависимостей
 

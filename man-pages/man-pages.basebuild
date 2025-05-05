@@ -2,15 +2,15 @@
 
 # Основные метаданные пакета
 
-PKG_NAME="libtool"
-PKG_VERSION="2.4.7"
-PKG_SRC_URL="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
+PKG_NAME="man-pages"
+PKG_VERSION="5.13"
+PKG_SRC_URL="https://www.kernel.org/pub/linux/docs/man-pages/man-pages-5.13.tar.xz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL"
 PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="libtool-2.4.7"
+PKG_BUILD_DIR="man-pages-5.13"
 
 # Разрешение зависимостей
 
@@ -44,11 +44,7 @@ unpack_stage() {
 # Фаза компиляции
 
 compile_stage() {
-  echo "Compiling package..."
-  cd "/tmp/$PKG_BUILD_DIR" || exit 1
-  ./configure --prefix="$PKG_INSTALL_DIR" || exit 1
-  make -j$(nproc) || exit 1
-  echo "Compilation completed."
+  echo "No compilation needed for man-pages."
 }
 
 # Фаза установки
@@ -56,7 +52,7 @@ compile_stage() {
 install_stage() {
   echo "Installing package to $PKG_INSTALL_DIR..."
   cd "/tmp/$PKG_BUILD_DIR" || exit 1
-  make install || exit 1
+  make install prefix="$PKG_INSTALL_DIR" || exit 1
   echo "Installation completed."
 }
 

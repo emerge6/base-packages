@@ -2,15 +2,15 @@
 
 # Основные метаданные пакета
 
-PKG_NAME="libtool"
-PKG_VERSION="2.4.7"
-PKG_SRC_URL="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
+PKG_NAME="linux-api-headers"
+PKG_VERSION="6.14"
+PKG_SRC_URL="https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.14.tar.xz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL"
 PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="libtool-2.4.7"
+PKG_BUILD_DIR="linux-5.16.9"
 
 # Разрешение зависимостей
 
@@ -44,19 +44,18 @@ unpack_stage() {
 # Фаза компиляции
 
 compile_stage() {
-  echo "Compiling package..."
+  echo "Preparing headers..."
   cd "/tmp/$PKG_BUILD_DIR" || exit 1
-  ./configure --prefix="$PKG_INSTALL_DIR" || exit 1
-  make -j$(nproc) || exit 1
-  echo "Compilation completed."
+  make headers || exit 1
+  echo "Header preparation completed."
 }
 
 # Фаза установки
 
 install_stage() {
-  echo "Installing package to $PKG_INSTALL_DIR..."
+  echo "Installing headers to $PKG_INSTALL_DIR..."
   cd "/tmp/$PKG_BUILD_DIR" || exit 1
-  make install || exit 1
+  make INSTALL_HDR_PATH="$PKG_INSTALL_DIR" headers_install || exit 1
   echo "Installation completed."
 }
 

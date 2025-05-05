@@ -1,8 +1,109 @@
-NAME=e2fsprogs
-VERSION=1.47.0
-DEPENDENCIES=glibc
-SOURCE_URL=https://mirrors.edge.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.0/e2fsprogs-1.47.0.tar.gz
-FETCH_METHOD=curl
-BUILD="./configure --prefix=/usr && make"
-INSTALL="make install"
+#!/bin/bash
 
+# Основные метаданные пакета
+
+PKG_NAME="e2fsprogs"
+PKG_VERSION="1.46.5"
+PKG_SRC_URL="https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.46.5/e2fsprogs-1.46.5.tar.gz"
+PKG_ARCHITECTURE="amd64"
+PKG_LICENSE="GPL"
+PKG_DEPENDENCIES=""
+PKG_FETCH_METHOD="wget"
+PKG_INSTALL_DIR="/usr/local"
+PKG_BUILD_DIR="e2fsprogs-1.46.5"
+
+# Разрешение зависимостей
+
+resolve_dependencies() {
+  if [ -n "$PKG_DEPENDENCIES" ]; then
+    echo "Resolving dependencies..."
+    for dep in $PKG_DEPENDENCIES; do
+      local dep_name=$(echo $dep | cut -d: -f1)
+      local dep_version=$(echo $dep | cut -d: -f2)
+      echo "Checking dependency: $dep_name version $dep_version"
+    done
+  else
+    echo "No dependencies."
+  fi
+}
+
+# Фаза распаковки
+
+unpack_stage() {
+  echo "Unpacking sources to $PKG_BUILD_DIR..."
+  mkdir -p "/tmp/$PKG_BUILD_DIR"
+  cd "/tmp/$PKG_BUILD_DIR" || exit 1
+  if ! wget -q "$PKG_SRC_URL" -O "$PKG_NAME-$PKG_VERSION.tar.gz"; then
+    echo "Error downloading sources from $PKG_SRC_URL"
+    exit 1
+  fi
+  tar -xzf "$PKG_NAME-$PKG_VERSION.tar.gz" --strip-components=1 || exit 1
+  echo "Unpacking completed."
+}
+
+# Фаза компиляции
+
+compile_stage() {
+  echo "Compiling package..."
+  cd "/tmp/$PKG_BUILD_DIR" || exit 1
+  ./configure --prefix="$PKG_INSTALL_DIR" || exit 1
+  make -j$(nproc) || exit 1
+  echo "Compilation completed."
+}
+
+# Фаза установки
+
+install_stage() {
+  echo "Installing package to $PKG_INSTALL_DIR..."
+  cd "/tmp/$PKG_BUILD_DIR" || exit 1
+  make install || exit 1
+  echo "Installation completed."
+}
+
+# Общая стадия
+
+default() {
+  echo "Building and installing package $PKG_NAME version $PKG_VERSION..."
+  resolve_dependencies
+  unpack_stage
+  compile_stage
+  install_stage
+}
+
+# Эмулятор команд
+
+emake() {
+  case "$1" in
+    "unpack")
+      unpack_stage
+      ;;
+    "compile")
+      compile_stage
+      ;;
+    "install")
+      install_stage
+      ;;
+    *)
+      echo "Unknown command: $1"
+      exit 1
+      ;;
+  esac
+}
+
+# Обработка ошибок
+
+handle_error() {
+  echo "Error: Build or installation process failed."
+  exit 1
+}
+
+# Главная функция
+
+main() {
+  trap 'handle_error' ERR
+  emake "$1"
+}
+
+# Запуск
+
+main "$@"

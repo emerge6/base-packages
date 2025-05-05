@@ -2,15 +2,15 @@
 
 # Основные метаданные пакета
 
-PKG_NAME="libtool"
-PKG_VERSION="2.4.7"
-PKG_SRC_URL="https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
+PKG_NAME="m4"
+PKG_VERSION="1.4.19"
+PKG_SRC_URL="https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz"
 PKG_ARCHITECTURE="amd64"
 PKG_LICENSE="GPL"
 PKG_DEPENDENCIES=""
 PKG_FETCH_METHOD="wget"
 PKG_INSTALL_DIR="/usr/local"
-PKG_BUILD_DIR="libtool-2.4.7"
+PKG_BUILD_DIR="m4-1.4.19"
 
 # Разрешение зависимостей
 
