@@ -16,9 +16,11 @@ resolve_dependencies() {
   if [ -n "$PKG_DEPENDENCIES" ]; then
     echo "Resolving dependencies..."
     for dep in $PKG_DEPENDENCIES; do
-      local dep_name=$(echo $dep | cut -d: -f1)
-      local dep_version=$(echo $dep | cut -d: -f2)
+      local dep_name dep_version
+      dep_name=${dep%%:*}
+      dep_version=${dep#*:}
       echo "Checking dependency: $dep_name version $dep_version"
+      # Здесь можно добавить реальную проверку через пакетный менеджер
     done
   else
     echo "No dependencies."
@@ -28,13 +30,22 @@ resolve_dependencies() {
 # Фаза распаковки
 unpack_stage() {
   echo "Unpacking sources to $PKG_BUILD_DIR..."
+  rm -rf "$PKG_BUILD_DIR"
   mkdir -p "$PKG_BUILD_DIR"
   cd /tmp || exit 1
-  if ! wget -q "$PKG_SRC_URL" -O "${PKG_NAME}-${PKG_VERSION}.tar.bz2"; then
+
+  echo "Downloading source archive..."
+  if ! $PKG_FETCH_METHOD -q "$PKG_SRC_URL" -O "${PKG_NAME}-${PKG_VERSION}.tar.bz2"; then
     echo "Error downloading sources from $PKG_SRC_URL"
     exit 1
   fi
-  tar -xjf "${PKG_NAME}-${PKG_VERSION}.tar.bz2" || exit 1
+
+  echo "Extracting archive..."
+  if ! tar -xjf "${PKG_NAME}-${PKG_VERSION}.tar.bz2"; then
+    echo "Error extracting archive"
+    exit 1
+  fi
+
   mv "unix-tree-${PKG_VERSION}" "$PKG_BUILD_DIR" || exit 1
   echo "Unpacking completed."
 }
@@ -43,7 +54,10 @@ unpack_stage() {
 compile_stage() {
   echo "Compiling package..."
   cd "$PKG_BUILD_DIR" || exit 1
-  make || exit 1
+  if ! make; then
+    echo "Compilation failed."
+    exit 1
+  fi
   echo "Compilation completed."
 }
 
@@ -51,7 +65,10 @@ compile_stage() {
 install_stage() {
   echo "Installing package to $PKG_INSTALL_DIR..."
   cd "$PKG_BUILD_DIR" || exit 1
-  make install PREFIX="$PKG_INSTALL_DIR" || exit 1
+  if ! make install PREFIX="$PKG_INSTALL_DIR"; then
+    echo "Installation failed."
+    exit 1
+  fi
   echo "Installation completed."
 }
 
@@ -92,7 +109,11 @@ handle_error() {
 # Главная функция
 main() {
   trap 'handle_error' ERR
-  emake "$1"
+  if [ -z "$1" ]; then
+    default
+  else
+    emake "$1"
+  fi
 }
 
 # Запуск
