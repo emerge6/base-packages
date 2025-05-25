@@ -56,22 +56,27 @@ compile_stage() {
   echo "Configuring and compiling GCC..."
   cd "$PKG_BUILD_DIR" || exit 1
 
-  # Настраиваем сборку: включаем языки, указываем зависимости
   if ! "${PKG_SRC_DIR}"/configure \
       --prefix="$PKG_INSTALL_DIR" \
       --enable-languages=c,c++ \
       --disable-multilib \
+      --disable-bootstrap \
+      --disable-fixincludes \
+      --enable-default-pie \
+      --enable-default-ssp \
+      --enable-checking=release \
       --with-gmp="/usr" \
       --with-mpfr="/usr" \
       --with-mpc="/usr" \
       --with-isl="/usr" \
       --enable-shared \
-      --enable-threads=posix; then
+      --enable-threads=posix \
+      --with-pkgversion="GCC for Openbase" \
+      --with-bugurl="https://openbase.org/bugs"; then
     echo "Error: configure failed"
     exit 1
   fi
 
-  # Компиляция
   if ! make -j"$(nproc)"; then
     echo "Error: make failed"
     exit 1
